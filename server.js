@@ -1,149 +1,141 @@
-window.SkymasterOS = (() => {
-  const API = "/api";
+import express from "express";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 
-  // =========================
-  // CONFIG
-  // =========================
-  const SCORE_MAP = {
-    page_view: 1,
-    click: 3,
-    product_view: 5,
-    checkout_click: 12,
-    stripe_click: 20,
-  };
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-  const STORAGE_KEYS = {
-    score: "ns_score",
-    user: "ns_user_id",
-    session: "ns_session_id",
-  };
+// =========================
+// RATE LIMITING (anti spam)
+// =========================
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+});
 
-  // =========================
-  // STATE HELPERS
-  // =========================
-  const get = (key, fallback = 0) =>
-    Number(localStorage.getItem(key) || fallback);
+app.use(limiter);
 
-  const set = (key, value) =>
-    localStorage.setItem(key, value);
+// =========================
+// IN-MEMORY SESSION STORE (swap for Redis in prod)
+// =========================
+const sessions = new Map();
 
-  const getScore = () => get(STORAGE_KEYS.score, 0);
-  const setScore = (v) => set(STORAGE_KEYS.score, v);
+// =========================
+// LEAD SCORING (SERVER TRUTH)
+// =========================
+const SCORE_MAP = {
+  page_view: 1,
+  click: 2,
+  product_view: 5,
+  checkout_click: 10,
+  stripe_click: 20,
+};
 
-  const getUserId = () =>
-    localStorage.getItem(STORAGE_KEYS.user) || "anon";
+function getSession(session_id) {
+  if (!sessions.has(session_id)) {
+    sessions.set(session_id, {
+      score: 0,
+      stage: "COLD",
+      events: [],
+      createdAt: Date.now(),
+    });
+  }
+  return sessions.get(session_id);
+}
 
-  const getSessionId = () =>
-    localStorage.getItem(STORAGE_KEYS.session) || "no-session";
+function calculateStage(score) {
+  if (score >= 25) return "HOT";
+  if (score >= 10) return "WARM";
+  return "COLD";
+}
 
-  // =========================
-  // SCORING ENGINE
-  // =========================
-  const addScore = (event) => {
-    const nextScore = getScore() + (SCORE_MAP[event] || 0);
-    setScore(nextScore);
-    return nextScore;
-  };
+// =========================
+// TRACK EVENT
+// =========================
+app.post("/api/hot-lead", (req, res) => {
+  const { event, session_id, user_id, data } = req.body;
 
-  const getStage = (score) => {
-    if (score >= 20) return "HOT";
-    if (score >= 8) return "WARM";
-    return "COLD";
-  };
-
-  // =========================
-  // CORE TRACKER
-  // =========================
-  async function track(event, data = {}) {
-    const score = addScore(event);
-    const stage = getStage(score);
-
-    const payload = {
-      event,
-      data,
-      score,
-      stage,
-      user_id: getUserId(),
-      session_id: getSessionId(),
-      url: window.location.href,
-      timestamp: Date.now(),
-    };
-
-    console.log("[SKYMASTER OS]", payload);
-
-    // send to backend (non-blocking)
-    fetch(`${API}/hot-lead`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }).catch(() => {});
-
-    // =========================
-    // AUTOPILOT LOGIC
-    // =========================
-    if (stage === "HOT") {
-      console.log("🔥 HOT LEAD DETECTED");
-
-      setTimeout(() => {
-        window.location.href =
-          "https://buy.stripe.com/9B6eV64qDcT20xpeDC2ZO0i";
-      }, 800);
-    }
-
-    return payload;
+  if (!session_id || !event) {
+    return res.status(400).json({ error: "Invalid payload" });
   }
 
-  // =========================
-  // FUNNEL ACTIONS
-  // =========================
-  const viewProduct = () => track("product_view");
+  const session = getSession(session_id);
 
-  const clickCheckout = () => {
-    track("checkout_click");
+  const scoreAdd = SCORE_MAP[event] || 0;
+  session.score += scoreAdd;
+  session.stage = calculateStage(session.score);
 
-    fetch(`${API}/checkout-click`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: getUserId(),
-        session_id: getSessionId(),
-        score: getScore(),
-      }),
-    }).catch(() => {});
-  };
+  session.events.push({
+    event,
+    data,
+    timestamp: Date.now(),
+  });
 
-  // =========================
-  // AUTO INIT
-  // =========================
-  function init() {
-    track("page_view");
+  // HOT LEAD DETECTION
+  const isHot = session.stage === "HOT";
 
-    document.addEventListener("click", (e) => {
-      const el = e.target.closest("a, button");
-      if (!el) return;
+  console.log("📊 EVENT:", {
+    user_id,
+    session_id,
+    event,
+    score: session.score,
+    stage: session.stage,
+  });
 
-      track("click", {
-        text: el.innerText?.trim() || "",
-        href: el.href || "",
-      });
+  return res.json({
+    success: true,
+    score: session.score,
+    stage: session.stage,
+    hot: isHot,
+  });
+});
+
+// =========================
+// CHECKOUT CLICK TRACKING
+// =========================
+app.post("/api/checkout-click", (req, res) => {
+  const { session_id } = req.body;
+
+  const session = getSession(session_id);
+  session.score += 10;
+
+  res.json({ ok: true });
+});
+
+// =========================
+// STRIPE CHECKOUT (SECURE VERSION)
+// =========================
+app.post("/api/create-checkout", async (req, res) => {
+  const { session_id } = req.body;
+
+  const session = getSession(session_id);
+
+  // BLOCK fake low-intent users
+  if (session.score < 8) {
+    return res.status(403).json({
+      error: "Not qualified for checkout",
     });
   }
 
-  // safe DOM init
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+  // HOT users bypass friction
+  const checkoutUrl =
+    session.score >= 25
+      ? "https://buy.stripe.com/9B6eV64qDcT20xpeDC2ZO0i"
+      : "https://buy.stripe.com/test-checkout-link";
 
-  // =========================
-  // PUBLIC API
-  // =========================
-  return {
-    track,
-    viewProduct,
-    clickCheckout,
-    getScore,
-    getStage,
-  };
-})();
+  res.json({ url: checkoutUrl });
+});
+
+// =========================
+// SESSION STATUS (for frontend UI)
+// =========================
+app.get("/api/session/:id", (req, res) => {
+  const session = getSession(req.params.id);
+
+  res.json(session);
+});
+
+app.listen(3000, () => {
+  console.log("🚀 Skymaster OS running on port 3000");
+});
