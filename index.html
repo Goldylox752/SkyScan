@@ -372,7 +372,7 @@ footer {
 <body>
 
 <div class="ribbon">
-  🚁 LIMITED STOCK: Free shipping + 2-year warranty + 30-day returns | 📲 WhatsApp support (click to chat)
+  🚁 LIMITED STOCK: Free shipping + 2-year warranty + 30-day returns | 📲 WhatsApp support
 </div>
 
 <div class="container">
@@ -394,7 +394,7 @@ footer {
       <div class="whatsapp-block">
         <i class="fab fa-whatsapp"></i>
         <span>Questions? <strong>Chat with an expert</strong> →</span>
-        <a id="whatsappHeroLink" href="#" target="_blank">WhatsApp <span class="wa-number"></span></a>
+        <a id="whatsappHeroLink" href="#" target="_blank">Chat on WhatsApp <i class="fab fa-whatsapp"></i></a>
       </div>
       <div class="trust-icons">
         <span><i class="fas fa-shield-alt"></i> 2-Year Warranty</span>
@@ -469,7 +469,7 @@ footer {
 </div>
 
 <footer>
-  <p>Skymaster X1 — built for roofing professionals. © 2026 | Secure checkout | All prices USD | <i class="fab fa-whatsapp"></i> WhatsApp <span class="wa-number"></span></p>
+  <p>Skymaster X1 — built for roofing professionals. © 2026 | Secure checkout | All prices USD | <i class="fab fa-whatsapp"></i> WhatsApp support</p>
 </footer>
 
 <!-- Contractor Lead Modal -->
@@ -494,18 +494,14 @@ const SUPABASE_URL = 'https://your-project.supabase.co';     // <-- Replace
 const SUPABASE_ANON_KEY = 'your-anon-key';                  // <-- Replace
 const PRODUCT_SKU = 'SKY-X1';                               // Your product SKU
 
-// ========== OBFUSCATED PHONE NUMBER (DO NOT CHANGE) ==========
+// ========== OBFUSCATED PHONE NUMBER (hidden, never shown on page) ==========
 (function() {
   const encoded = "37697620871"; // reverse of "17802679673"
   const phoneNumber = encoded.split('').reverse().join('');
-  let raw = phoneNumber;
-  if (raw.startsWith('1')) raw = raw.substring(1);
-  const formatted = `${raw.substring(0,3)}-${raw.substring(3,6)}-${raw.substring(6,10)}`;
   const waLinks = document.querySelectorAll('#whatsappHeroLink, #whatsappStickyLink');
   waLinks.forEach(link => {
     link.href = `https://wa.me/${phoneNumber}?text=Hello%2C%20I%27m%20interested%20in%20the%20Skymaster%20X1%20drone.`;
   });
-  document.querySelectorAll('.wa-number').forEach(el => el.textContent = formatted);
 })();
 
 // ========== FETCH AND DISPLAY REAL-TIME STOCK ==========
@@ -528,7 +524,6 @@ async function fetchStock() {
       if (currentStock > 0) {
         stockBadge.innerHTML = `<i class="fas fa-box"></i> Only ${currentStock} units left`;
         urgencySpan.textContent = currentStock <= 10 ? '⚠️ Almost gone!' : '⚡ Selling fast';
-        // Enable buy buttons
         document.getElementById('buyNowBtn').disabled = false;
         document.getElementById('stickyBuyBtn').disabled = false;
       } else {
@@ -558,8 +553,8 @@ async function startCheckout() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        success_url: window.location.href + '?success=true',
-        cancel_url: window.location.href + '?cancel=true'
+        success_url: window.location.origin + '/success',
+        cancel_url: window.location.origin + '/cancel'
       })
     });
     const data = await response.json();
@@ -622,7 +617,7 @@ document.getElementById('leadForm').addEventListener('submit', async (e) => {
   }
 });
 
-// Handle URL success/cancel parameters
+// Handle URL success/cancel parameters (if any)
 if (window.location.search.includes('success=true')) {
   alert('Order placed successfully! You will receive a confirmation email.');
   history.replaceState({}, '', window.location.pathname);
