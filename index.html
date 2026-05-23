@@ -1,434 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Skymaster X1 Pro | 4K Roof Inspection Drone</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at 10% 20%, #0B0E17, #05070C);
-      color: #EDF2FF;
-      line-height: 1.5;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="North Sky Drones - AI-powered drone inspections, mapping, and automation. Reduce costs, improve safety, and get actionable data in minutes." />
+<title>North Sky Drones | AI Inspection & Automation</title>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-528699336"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-528699336');
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<style>
+  :root {
+    --bg-dark: #05060a;
+    --bg-card: #0c0f17;
+    --border: #1e2438;
+    --accent: #4dd0e1;
+    --accent-dark: #2ba0b3;
+    --text: #ffffff;
+    --text-dim: #a1a9c0;
+    --glow: rgba(77, 208, 225, 0.2);
+    --gradient: linear-gradient(135deg, #4dd0e1 0%, #2b9bb0 100%);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 10% 20%, rgba(77, 208, 225, 0.08) 0%, rgba(5, 6, 10, 0) 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    background: rgba(5, 6, 10, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    border-bottom: 1px solid rgba(30, 36, 56, 0.5);
+  }
+
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+  }
+
+  .btn-primary {
+    background: var(--gradient);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(77, 208, 225, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(77, 208, 225, 0.4);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    background: rgba(77, 208, 225, 0.1);
+  }
+
+  .hero {
+    text-align: center;
+    padding: 100px 20px 80px;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(77, 208, 225, 0.15);
+    border: 1px solid rgba(77, 208, 225, 0.3);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    color: var(--accent);
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff 60%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 720px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  .section {
+    padding: 80px 0;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent);
+    box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+
+  .card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .cta-section {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(13, 15, 24, 0.9) 0%, rgba(5, 6, 10, 0.95) 100%);
+    border-radius: 40px;
+    margin: 40px auto;
+    padding: 60px 40px;
+    border: 1px solid var(--border);
+  }
+
+  .cta-section h2 {
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .cta-section p {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    font-size: 18px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 32px;
+    max-width: 480px;
+    width: 90%;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover {
+    color: var(--accent);
+  }
+
+  .modal h3 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+
+  .modal p {
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0f121c;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border 0.2s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .btn-block {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 60px 24px 40px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
     }
-    .container { max-width: 1280px; margin: 0 auto; padding: 1.5rem 2rem; }
-    .glass-card {
-      background: rgba(20, 28, 40, 0.65);
-      backdrop-filter: blur(12px);
-      border-radius: 2rem;
-      border: 1px solid rgba(72, 187, 255, 0.2);
-      transition: transform 0.25s ease, box-shadow 0.3s ease;
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate {
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @media (max-width: 768px) {
+    .nav {
+      padding: 16px 24px;
     }
     .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2.5rem;
-      align-items: center;
-      padding: 3rem 0 2rem;
+      padding: 60px 16px 40px;
     }
-    .hero-content h1 {
-      font-size: 3.4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #FFFFFF, #94A3F8);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 1rem;
+    .section {
+      padding: 60px 0;
     }
-    .price {
-      font-size: 2.6rem;
-      font-weight: 800;
-      color: #4ADE80;
+    .cta-section {
+      padding: 40px 24px;
     }
-    .btn-group { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.8rem 0 1rem; }
-    .btn {
-      padding: 0.9rem 2rem;
-      border-radius: 3rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      transition: all 0.2s;
-    }
-    .btn-primary { background: #2563EB; color: white; box-shadow: 0 8px 18px -6px #1E40AF; }
-    .btn-primary:hover { background: #1D4ED8; transform: scale(1.02); }
-    .btn-secondary { background: rgba(37, 99, 235, 0.12); border: 1px solid #3B82F6; color: #E2E8FF; }
-    .btn-secondary:hover { background: rgba(37, 99, 235, 0.25); }
-    .stock-badge {
-      background: rgba(16, 185, 129, 0.15);
-      border-radius: 3rem;
-      padding: 0.4rem 1rem;
-      font-size: 0.85rem;
-      display: inline-block;
-    }
-    .feature-card {
-      padding: 1.8rem;
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 2rem;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-    }
-    .feature-list { display: flex; flex-direction: column; gap: 0.9rem; }
-    .feature-item { display: flex; align-items: center; gap: 0.8rem; }
-    .feature-item i { width: 1.8rem; color: #4ADE80; }
-    footer { text-align: center; padding: 3rem 1rem; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem; opacity: 0.7; }
-
-    /* Modal styles */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-container {
-      background: #0F172A;
-      max-width: 520px;
-      width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
-      border-radius: 2rem;
-      padding: 1.8rem;
-      border: 1px solid #334155;
-    }
-    .modal-container h3 { font-size: 1.6rem; margin-bottom: 0.5rem; }
-    input, select {
-      width: 100%;
-      background: #1E293B;
-      border: 1px solid #334155;
-      padding: 0.8rem 1rem;
-      border-radius: 1rem;
-      color: white;
-      margin: 0.4rem 0;
-    }
-    input:focus { outline: none; border-color: #3B82F6; }
-    .order-summary {
-      background: #1E293B;
-      border-radius: 1rem;
-      padding: 1rem;
-      margin: 1rem 0;
-    }
-    .close-modal {
-      float: right;
-      background: none;
-      border: none;
-      color: #94A3B8;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E293B;
-      border-left: 5px solid #4ADE80;
-      padding: 0.8rem 1.8rem;
-      border-radius: 2rem;
-      z-index: 1100;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-    .toast.show { opacity: 1; }
-    .whatsapp-float {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #25D366;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 35px;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-      z-index: 100;
-      transition: transform 0.2s;
-      text-decoration: none;
-      color: white;
-    }
-    .whatsapp-float:hover { transform: scale(1.1); background: #128C7E; }
-    @media (max-width: 900px) { .hero { grid-template-columns: 1fr; text-align: center; } }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-<div class="container">
+<div class="nav">
+  <div class="logo">NORTH SKY DRONES</div>
+  <button class="btn btn-outline" id="loginBtn">Login</button>
+</div>
+
+<main>
   <div class="hero">
-    <div class="hero-content">
-      <h1>Inspect roofs in minutes.<br>Zero risk. 4K precision.</h1>
-      <div class="price">$899 USD</div>
-      <div class="btn-group">
-        <button class="btn btn-primary" id="buyBtn"><i class="fas fa-shopping-cart"></i> Buy Now</button>
-        <button class="btn btn-secondary" id="leadBtn"><i class="fas fa-building"></i> Contractor Pricing</button>
+    <div class="hero-badge">AI-POWERED INSPECTIONS</div>
+    <h1>AI-powered drone inspections at scale</h1>
+    <p>
+      North Sky Drones automates aerial inspections, mapping, and data capture using intelligent flight systems and real-time AI analysis.
+      Reduce field costs, improve safety, and get actionable data in minutes — not days.
+    </p>
+    <button class="btn btn-primary" id="demoBtn">Request Demo Flight <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></button>
+  </div>
+
+  <div class="container">
+    <div class="section">
+      <h2 class="section-title">What our drones do</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">🏗️</div>
+          <h3>Infrastructure Inspection</h3>
+          <p>Inspect roofs, towers, pipelines, and assets without sending crews on-site.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <h3>AI Damage Detection</h3>
+          <p>Automatically detect cracks, leaks, and structural issues in real time.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📍</div>
+          <h3>Mapping & Surveying</h3>
+          <p>Generate high-precision maps and 3D models instantly after flight.</p>
+        </div>
       </div>
-      <div class="stock-badge" id="stockContainer"><i class="fas fa-boxes"></i> <span id="stockText">Checking stock...</span></div>
     </div>
-    <div class="feature-card">
-      <h3><i class="fas fa-microchip"></i> Key Features</h3>
-      <div class="feature-list">
-        <div class="feature-item"><i class="fas fa-camera"></i> 4K HDR + 10x Zoom</div>
-        <div class="feature-item"><i class="fas fa-battery-full"></i> 35 min flight time</div>
-        <div class="feature-item"><i class="fas fa-satellite-dish"></i> RTK GPS Precision</div>
-        <div class="feature-item"><i class="fas fa-chart-line"></i> AI Roof Reports</div>
+
+    <div class="section">
+      <h2 class="section-title">How it works</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">1️⃣</div>
+          <h3>Deploy</h3>
+          <p>Launch a drone mission manually or automatically.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">2️⃣</div>
+          <h3>Capture</h3>
+          <p>High-resolution aerial data is collected in real time.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">3️⃣</div>
+          <h3>Analyze</h3>
+          <p>AI processes images and generates actionable reports.</p>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-<footer>© 2026 Skymaster X1 Pro — Trusted by 1,200+ contractors</footer>
 
-<!-- Simple WhatsApp floating button (hidden numbers, just chat with support) -->
-<a href="#" id="whatsappSupportLink" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
-  <i class="fab fa-wa"></i>
-</a>
-
-<!-- CHECKOUT MODAL -->
-<div id="checkoutModal" class="modal-overlay">
-  <div class="modal-container">
-    <button class="close-modal" id="closeCheckoutBtn">&times;</button>
-    <h3><i class="fas fa-shopping-bag"></i> Complete your order</h3>
-    <div class="order-summary">
-      <p><strong>Skymaster X1 Pro</strong> – 4K Roof Inspection Drone</p>
-      <p>Price: $899 <span style="color:#4ADE80;">USD</span></p>
-      <p>Quantity: 1</p>
-      <hr style="margin: 8px 0; border-color:#334155;">
-      <p><strong>Total: $899 USD</strong></p>
+    <div class="section">
+      <h2 class="section-title">Why teams use North Sky</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>10x faster inspections</h3>
+          <p>Cut field inspection time from hours to minutes.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💰</div>
+          <h3>Lower operational cost</h3>
+          <p>Reduce labor, travel, and equipment expenses.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛡️</div>
+          <h3>Safer operations</h3>
+          <p>Remove humans from hazardous environments.</p>
+        </div>
+      </div>
     </div>
-    <input type="text" id="fullName" placeholder="Full name *" autocomplete="name">
-    <input type="email" id="emailAddress" placeholder="Email address *" autocomplete="email">
-    <input type="text" id="shippingAddress" placeholder="Shipping address *">
-    <input type="text" id="cardNumber" placeholder="Card number (demo: 4242 4242 4242 4242)" maxlength="19">
-    <div style="display: flex; gap: 10px;">
-      <input type="text" id="expiry" placeholder="MM/YY" style="width:50%;">
-      <input type="text" id="cvc" placeholder="CVC" style="width:50%;" maxlength="4">
+
+    <div class="cta-section">
+      <h2>Ready to modernize your inspections?</h2>
+      <p>Book a live demo flight and see North Sky in action.</p>
+      <button class="btn btn-primary" id="ctaBtn">Get Started <i class="fas fa-rocket" style="margin-left: 8px;"></i></button>
     </div>
-    <button id="placeOrderBtn" class="btn btn-primary" style="width:100%; margin-top: 1rem;"><i class="fas fa-lock"></i> Place order (simulated)</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 North Sky Drones. All rights reserved.
+</footer>
+
+<div id="demoModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" id="closeModal">&times;</span>
+    <h3>Request a demo flight</h3>
+    <p>Our team will contact you within 24 hours to schedule a live flight demonstration.</p>
+    <form id="demoForm">
+      <div class="form-group">
+        <input type="text" id="name" placeholder="Full name" required />
+      </div>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="Email address" required />
+      </div>
+      <div class="form-group">
+        <input type="text" id="company" placeholder="Company name (optional)" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Submit request</button>
+    </form>
   </div>
 </div>
-
-<!-- LEAD MODAL (Contractor Pricing) -->
-<div id="leadModal" class="modal-overlay">
-  <div class="modal-container">
-    <button class="close-modal" id="closeLeadBtn">&times;</button>
-    <h3><i class="fas fa-file-signature"></i> Contractor pricing request</h3>
-    <input type="text" id="leadName" placeholder="Full name *">
-    <input type="email" id="leadEmail" placeholder="Business email *">
-    <button id="submitLeadBtn" class="btn btn-primary" style="width:100%;">Submit</button>
-  </div>
-</div>
-
-<div id="toastMsg" class="toast"></div>
 
 <script>
-  // ========== HIDDEN NUMBERS (obfuscated to avoid scraping) ==========
-  // Owner's phone (Canada) - 7802679673  -> will be used in message to supplier
-  // Supplier's phone (China) - +86 173 7051 1617 -> recipient of order notification
-  // We'll store as reversed strings then decode at runtime
-  
-  const encodedOwner = "3769762087"; // reverse of 7802679673? Actually reverse: 3769762087? Let's do proper: "7802679673" reversed is "3769762087". Yes.
-  const encodedSupplier = "716150737168"; // reverse of "8617370511617"? Wait, supplier number in international format without plus: 8617370511617, reverse is "716150737168". Correct.
-  
-  function decodeNumber(encoded) {
-    return encoded.split('').reverse().join('');
-  }
-  
-  const ownerNumber = decodeNumber(encodedOwner);      // "7802679673"
-  const supplierNumber = decodeNumber(encodedSupplier); // "8617370511617"
-  
-  // For WhatsApp floating button: we'll use owner's number for general contact? But requirement wants numbers hidden.
-  // We'll set the floating button to open chat with owner? Or supplier? Better to set to owner's support.
-  // But to avoid revealing, we dynamically generate the link when clicked.
-  const whatsappFloat = document.getElementById('whatsappSupportLink');
-  if (whatsappFloat) {
-    whatsappFloat.addEventListener('click', (e) => {
-      e.preventDefault();
-      const msg = "Hello, I have a question about Skymaster X1 Pro.";
-      const url = `https://wa.me/1${ownerNumber}?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
+  (function() {
+    // Modal handling
+    const modal = document.getElementById('demoModal');
+    const demoBtn = document.getElementById('demoBtn');
+    const ctaBtn = document.getElementById('ctaBtn');
+    const closeModal = document.getElementById('closeModal');
+    const loginBtn = document.getElementById('loginBtn');
+
+    function openModal() {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      gtag('event', 'view_demo_modal', { event_category: 'engagement', event_label: 'demo_request_opened' });
+    }
+
+    function closeModalFunc() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    if (demoBtn) demoBtn.addEventListener('click', openModal);
+    if (ctaBtn) ctaBtn.addEventListener('click', openModal);
+    if (closeModal) closeModal.addEventListener('click', closeModalFunc);
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) closeModalFunc();
     });
-  }
-  
-  // ========== STOCK MANAGEMENT ==========
-  let currentStock = 14;
-  const stockSpan = document.getElementById('stockText');
-  const buyBtn = document.getElementById('buyBtn');
 
-  function updateStockUI() {
-    if (currentStock <= 0) {
-      stockSpan.innerHTML = '<i class="fas fa-ban"></i> Out of stock';
-      buyBtn.disabled = true;
-      buyBtn.style.opacity = '0.5';
-    } else {
-      stockSpan.innerHTML = `<i class="fas fa-check-circle"></i> In stock: ${currentStock} units`;
-      buyBtn.disabled = false;
-      buyBtn.style.opacity = '1';
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        gtag('event', 'login_click', { event_category: 'engagement', event_label: 'nav_login' });
+        alert('Login portal coming soon. Request a demo to get early access.');
+      });
     }
-  }
 
-  function showToast(msg, isError = false) {
-    const toast = document.getElementById('toastMsg');
-    toast.textContent = msg;
-    toast.style.borderLeftColor = isError ? '#EF4444' : '#4ADE80';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+    const form = document.getElementById('demoForm');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const company = document.getElementById('company').value.trim();
 
-  // ========== CHECKOUT MODAL LOGIC ==========
-  const checkoutModal = document.getElementById('checkoutModal');
-  const closeCheckout = document.getElementById('closeCheckoutBtn');
-  const placeOrderBtn = document.getElementById('placeOrderBtn');
+        if (!name || !email) {
+          alert('Please fill in name and email.');
+          return;
+        }
+        if (!email.includes('@')) {
+          alert('Please enter a valid email address.');
+          return;
+        }
 
-  function openCheckout() {
-    if (currentStock <= 0) {
-      showToast("Sorry, out of stock.", true);
-      return;
+        gtag('event', 'demo_form_submit', {
+          event_category: 'conversion',
+          event_label: 'demo_request',
+          value: 1,
+          customer_name: name,
+          customer_email: email
+        });
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
+
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('Demo request:', { name, email, company });
+          alert(`Thank you ${name}! We'll contact you at ${email} to schedule your demo flight.`);
+          closeModalFunc();
+          form.reset();
+        } catch (err) {
+          alert('Something went wrong. Please try again.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
+        }
+      });
     }
-    checkoutModal.style.display = 'flex';
-  }
 
-  function closeCheckoutModal() {
-    checkoutModal.style.display = 'none';
-  }
+    // Scroll reveal animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
 
-  function validateCheckoutForm() {
-    const name = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('emailAddress').value.trim();
-    const address = document.getElementById('shippingAddress').value.trim();
-    const card = document.getElementById('cardNumber').value.replace(/\s/g, '');
-    const expiry = document.getElementById('expiry').value.trim();
-    const cvc = document.getElementById('cvc').value.trim();
-    if (!name) { showToast("Full name required", true); return false; }
-    if (!email || !email.includes('@')) { showToast("Valid email required", true); return false; }
-    if (!address) { showToast("Shipping address required", true); return false; }
-    if (card.length < 15) { showToast("Card number must be at least 15 digits", true); return false; }
-    if (!expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) { showToast("Expiry format MM/YY", true); return false; }
-    if (!cvc.match(/^\d{3,4}$/)) { showToast("CVC must be 3-4 digits", true); return false; }
-    return true;
-  }
-  
-  // Function to send WhatsApp order notification to supplier (hidden number)
-  function notifySupplierViaWhatsApp(orderDetails) {
-    // orderDetails: { customerName, email, address, product, total, ownerPhone }
-    const message = `🛸 *NEW SKYMASTER ORDER* 🛸\n\n` +
-      `👤 Customer: ${orderDetails.customerName}\n` +
-      `📧 Email: ${orderDetails.email}\n` +
-      `📍 Address: ${orderDetails.address}\n` +
-      `📦 Product: Skymaster X1 Pro (4K Roof Drone)\n` +
-      `💰 Total: $899 USD\n` +
-      `📞 Store contact (owner): +1${orderDetails.ownerPhone}\n` +
-      `⏱️ Order placed: ${new Date().toLocaleString()}\n\n` +
-      `Please process shipping.`;
-    
-    // Supplier number is already decoded (international format without '+')
-    const waLink = `https://wa.me/${supplierNumber}?text=${encodeURIComponent(message)}`;
-    // Open in new tab so supplier gets notification (customer will see chat window)
-    window.open(waLink, '_blank');
-  }
-
-  async function processOrder() {
-    if (!validateCheckoutForm()) return;
-    if (currentStock <= 0) {
-      showToast("Stock ran out during checkout", true);
-      closeCheckoutModal();
-      return;
-    }
-    
-    const customerName = document.getElementById('fullName').value.trim();
-    const customerEmail = document.getElementById('emailAddress').value.trim();
-    const customerAddress = document.getElementById('shippingAddress').value.trim();
-    
-    // Simulate payment processing
-    placeOrderBtn.disabled = true;
-    placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Reduce stock
-    currentStock--;
-    updateStockUI();
-    
-    // Prepare order details for supplier notification
-    const orderInfo = {
-      customerName: customerName,
-      email: customerEmail,
-      address: customerAddress,
-      product: "Skymaster X1 Pro",
-      total: "$899 USD",
-      ownerPhone: ownerNumber  // hidden owner number included in message
-    };
-    
-    // Send WhatsApp to supplier (opens new tab with pre-filled message)
-    notifySupplierViaWhatsApp(orderInfo);
-    
-    showToast(`✅ Order placed! Your Skymaster X1 Pro will ship soon. Stock left: ${currentStock}`);
-    
-    // Reset form and close modal
-    document.getElementById('fullName').value = '';
-    document.getElementById('emailAddress').value = '';
-    document.getElementById('shippingAddress').value = '';
-    document.getElementById('cardNumber').value = '';
-    document.getElementById('expiry').value = '';
-    document.getElementById('cvc').value = '';
-    placeOrderBtn.disabled = false;
-    placeOrderBtn.innerHTML = '<i class="fas fa-lock"></i> Place order (simulated)';
-    closeCheckoutModal();
-  }
-
-  // ========== LEAD MODAL ==========
-  const leadModal = document.getElementById('leadModal');
-  const leadBtn = document.getElementById('leadBtn');
-  const closeLead = document.getElementById('closeLeadBtn');
-  const submitLead = document.getElementById('submitLeadBtn');
-
-  function openLeadModal() { leadModal.style.display = 'flex'; }
-  function closeLeadModal() { leadModal.style.display = 'none'; }
-
-  submitLead.addEventListener('click', () => {
-    const name = document.getElementById('leadName').value.trim();
-    const email = document.getElementById('leadEmail').value.trim();
-    if (!name || !email) { showToast("Please fill name and email", true); return; }
-    if (!email.includes('@')) { showToast("Valid email required", true); return; }
-    // Save to localStorage for demo
-    const leads = JSON.parse(localStorage.getItem('skymaster_leads') || '[]');
-    leads.push({ name, email, date: new Date().toISOString() });
-    localStorage.setItem('skymaster_leads', JSON.stringify(leads));
-    showToast(`Thanks ${name}! Contractor pricing sent to ${email}`);
-    document.getElementById('leadName').value = '';
-    document.getElementById('leadEmail').value = '';
-    closeLeadModal();
-  });
-
-  // ========== EVENT LISTENERS ==========
-  buyBtn.addEventListener('click', openCheckout);
-  closeCheckout.addEventListener('click', closeCheckoutModal);
-  placeOrderBtn.addEventListener('click', processOrder);
-  leadBtn.addEventListener('click', openLeadModal);
-  closeLead.addEventListener('click', closeLeadModal);
-  window.addEventListener('click', (e) => {
-    if (e.target === checkoutModal) closeCheckoutModal();
-    if (e.target === leadModal) closeLeadModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeCheckoutModal();
-      closeLeadModal();
-    }
-  });
-
-  // ========== INIT ==========
-  updateStockUI();
-  
-  // Optional: ensure no numbers are visible in HTML or console (they are obfuscated in source)
-  console.log("Phone numbers are hidden and only used for order notifications.");
+    document.querySelectorAll('.card, .cta-section, .hero h1, .hero p, .hero-badge, .section-title').forEach(el => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+  })();
 </script>
 </body>
 </html>
