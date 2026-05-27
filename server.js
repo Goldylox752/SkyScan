@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 app.post("/create-checkout", async (req, res) => {
   const requestId = crypto.randomUUID();
 
@@ -11,7 +13,9 @@ app.post("/create-checkout", async (req, res) => {
       });
     }
 
-    // 1. Fetch product
+    /* =========================
+       1. FETCH PRODUCT
+    ========================= */
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("*")
@@ -28,61 +32,71 @@ app.post("/create-checkout", async (req, res) => {
     const price = Number(product.price);
 
     if (!price || price <= 0) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: "Invalid product price",
         requestId
       });
     }
 
-    // 2. Atomic stock check (prevents oversell race conditions)
-    if (product.stock <= 0) {
-      return res.status(400).json({
-        error: "Out of stock",
-        requestId
-      });
-    }
+    /* =========================
+       2. ATOMIC STOCK RESERVATION
+       (prevents overselling)
+    ========================= */
 
-    // OPTIONAL: reserve stock immediately (soft lock)
-    const { error: reserveError } = await supabase
+    const { data: updated, error: stockError } = await supabase
       .from("products")
       .update({
         stock: product.stock - 1,
-        reserved_stock: (product.reserved_stock || 0) + 1,
-        updated_at: new Date().toISOString()
+        reserved_stock: (product.reserved_stock || 0) + 1
       })
       .eq("sku", sku)
-      .eq("stock", product.stock); // optimistic locking
+      .eq("stock", product.stock)
+      .select()
+      .single();
 
-    if (reserveError) {
+    if (stockError || !updated) {
       return res.status(409).json({
-        error: "Stock changed, retry checkout",
+        error: "Stock changed, please retry",
         requestId
       });
     }
 
-    // 3. Create pending order
+    /* =========================
+       3. CREATE ORDER (idempotent)
+    ========================= */
+
     const { data: order, error: orderError } = await supabase
       .from("orders")
-      .insert([
-        {
-          sku: product.sku,
-          product_id: product.id,
-          status: "pending",
-          amount: price,
-          request_id: requestId
-        }
-      ])
+      .insert({
+        sku: product.sku,
+        product_id: product.id,
+        status: "pending",
+        amount: price,
+        request_id: requestId
+      })
       .select()
       .single();
 
-    if (orderError) {
+    if (orderError || !order) {
+      // rollback stock if order fails
+      await supabase
+        .from("products")
+        .update({
+          stock: product.stock,
+          reserved_stock: Math.max((product.reserved_stock || 1) - 1, 0)
+        })
+        .eq("sku", sku);
+
       return res.status(500).json({
         error: "Failed to create order",
         requestId
       });
     }
 
-    // 4. Create Stripe session
+    /* =========================
+       4. STRIPE SESSION
+    ========================= */
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -112,7 +126,10 @@ app.post("/create-checkout", async (req, res) => {
       cancel_url: `${process.env.FRONTEND_URL}/cancel`
     });
 
-    // 5. Attach Stripe session to order
+    /* =========================
+       5. LINK SESSION → ORDER
+    ========================= */
+
     await supabase
       .from("orders")
       .update({
