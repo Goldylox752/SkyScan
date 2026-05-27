@@ -1,56 +1,98 @@
 import { chromium } from "playwright";
+import { mapProduct } from "./mapProduct.js";
 
 /**
- * Scrape AliExpress search results
+ * AliExpress AI Product Scraper (Resilient v2)
  */
-export async function scrapeAliExpress(query) {
+export async function scrapeAliExpress(query, { pages = 1 } = {}) {
   const browser = await chromium.launch({
     headless: true
   });
 
-  const page = await browser.newPage();
-
-  const url = `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(query)}`;
-
-  await page.goto(url, {
-    waitUntil: "domcontentloaded"
+  const context = await browser.newContext({
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122 Safari/537.36",
+    locale: "en-US"
   });
 
-  await page.waitForTimeout(3000);
+  const page = await context.newPage();
 
-  const products = await page.evaluate(() => {
-    const items = document.querySelectorAll(".search-item-card-wrapper-gallery");
+  const results = [];
 
-    const results = [];
+  try {
+    for (let i = 0; i < pages; i++) {
+      const url = `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(
+        query
+      )}&page=${i + 1}`;
 
-    items.forEach((item) => {
-      const title =
-        item.querySelector("h1, h2, h3")?.innerText?.trim();
+      await page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 60000
+      });
 
-      const price =
-        item.querySelector(".multi--price-sale")?.innerText ||
-        item.querySelector(".price-current")?.innerText;
+      // allow lazy render
+      await page.waitForTimeout(4000);
 
-      const image =
-        item.querySelector("img")?.src;
+      const products = await page.evaluate(() => {
+        const items = document.querySelectorAll("a.search-card-item");
 
-      const link =
-        item.querySelector("a")?.href;
+        const out = [];
 
-      if (title && price && link) {
-        results.push({
-          title,
-          price: parseFloat(price.replace(/[^0-9.]/g, "")),
-          image,
-          url: link
+        items.forEach((item) => {
+          const title =
+            item.querySelector(".search-card-item__title")?.innerText?.trim();
+
+          const priceText =
+            item.querySelector(".search-card-item__price")?.innerText ||
+            item.querySelector(".multi--price-sale")?.innerText;
+
+          const image =
+            item.querySelector("img")?.getAttribute("src") ||
+            item.querySelector("img")?.getAttribute("data-src");
+
+          const link = item.href;
+
+          if (!title || !priceText || !link) return;
+
+          const price = Number(
+            priceText.replace(/[^0-9.]/g, "")
+          );
+
+          if (!price || price <= 0) return;
+
+          out.push({
+            title,
+            price,
+            image,
+            url: link
+          });
         });
-      }
-    });
 
-    return results;
-  });
+        return out;
+      });
 
-  await browser.close();
+      results.push(...products);
+    }
 
-  return products;
+    // normalize + map into your store format
+    const mapped = results
+      .map((p) => mapProduct(p))
+      .filter(Boolean);
+
+    return {
+      query,
+      count: mapped.length,
+      products: mapped
+    };
+  } catch (err) {
+    console.error("Scrape failed:", err);
+
+    return {
+      query,
+      count: 0,
+      products: []
+    };
+  } finally {
+    await browser.close();
+  }
 }
