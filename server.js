@@ -5,6 +5,10 @@ import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const app = express();
+
+/* =========================
+   ENV + CLIENTS
+========================= */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const supabase = createClient(
@@ -12,22 +16,33 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const BASE_URL = process.env.BASE_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const SUPPLIER_WEBHOOK = process.env.SUPPLIER_WEBHOOK;
+
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors());
 app.use(express.json());
 
-const rawBody = express.raw({ type: "application/json" });
+// Stripe requires raw body
+const stripeRaw = express.raw({ type: "application/json" });
 
 /* =========================
    HELPERS
 ========================= */
-
 const safeNumber = (v) => {
   const n = Number(v);
-  return isNaN(n) ? null : n;
+  return Number.isFinite(n) ? n : null;
+};
+
+const log = (tag, data) => {
+  console.log(`[${tag}]`, JSON.stringify(data));
 };
 
 /* =========================
-   1. PRODUCTS API (STORE FRONT)
+   1. PRODUCTS (STORE FRONT)
 ========================= */
 app.get("/products", async (req, res) => {
   const { data, error } = await supabase
@@ -37,7 +52,7 @@ app.get("/products", async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  res.json(data);
+  res.json(data || []);
 });
 
 /* =========================
@@ -52,7 +67,7 @@ app.post("/create-checkout", async (req, res) => {
   }
 
   try {
-    /* 1. Fetch product */
+    /* FETCH PRODUCT */
     const { data: product, error } = await supabase
       .from("products")
       .select("*")
@@ -65,29 +80,31 @@ app.post("/create-checkout", async (req, res) => {
 
     const price = safeNumber(product.price);
 
-    if (!price) {
-      return res.status(500).json({ error: "Invalid price", requestId });
+    if (!price || price <= 0) {
+      return res.status(400).json({ error: "Invalid price", requestId });
     }
 
     if (product.stock <= 0) {
       return res.status(400).json({ error: "Out of stock", requestId });
     }
 
-    /* 2. Reserve stock (safe lock) */
+    /* RESERVE STOCK (OPTIMISTIC LOCK) */
     const { error: stockErr } = await supabase
       .from("products")
-      .update({ stock: product.stock - 1 })
+      .update({
+        stock: product.stock - 1
+      })
       .eq("sku", sku)
       .eq("stock", product.stock);
 
     if (stockErr) {
       return res.status(409).json({
-        error: "Stock conflict, retry checkout",
+        error: "Stock changed, retry",
         requestId
       });
     }
 
-    /* 3. Create order (PENDING) */
+    /* CREATE ORDER */
     const { data: order, error: orderErr } = await supabase
       .from("orders")
       .insert({
@@ -101,13 +118,14 @@ app.post("/create-checkout", async (req, res) => {
       .single();
 
     if (orderErr) {
-      return res.status(500).json({ error: "Order creation failed", requestId });
+      return res.status(500).json({ error: "Order failed", requestId });
     }
 
-    /* 4. Stripe session */
+    /* STRIPE SESSION */
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
+
       line_items: [
         {
           price_data: {
@@ -121,22 +139,27 @@ app.post("/create-checkout", async (req, res) => {
           quantity: 1
         }
       ],
+
       metadata: {
         sku,
         order_id: order.id,
         request_id: requestId
       },
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`
+
+      success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${FRONTEND_URL}/cancel`
     });
 
-    /* 5. attach session */
+    /* ATTACH SESSION */
     await supabase
       .from("orders")
       .update({ stripe_session_id: session.id })
       .eq("id", order.id);
 
-    res.json({ url: session.url, requestId });
+    res.json({
+      url: session.url,
+      requestId
+    });
 
   } catch (err) {
     console.error("Checkout error:", err);
@@ -147,7 +170,7 @@ app.post("/create-checkout", async (req, res) => {
 /* =========================
    3. STRIPE WEBHOOK (SOURCE OF TRUTH)
 ========================= */
-app.post("/stripe-webhook", rawBody, async (req, res) => {
+app.post("/stripe-webhook", stripeRaw, async (req, res) => {
   let event;
 
   try {
@@ -160,39 +183,45 @@ app.post("/stripe-webhook", rawBody, async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    const { order_id, sku } = session.metadata;
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const { order_id, sku } = session.metadata;
 
-    /* idempotency guard */
-    const { data: existing } = await supabase
-      .from("orders")
-      .select("status")
-      .eq("id", order_id)
-      .single();
+      /* IDENTITY CHECK */
+      const { data: order } = await supabase
+        .from("orders")
+        .select("status")
+        .eq("id", order_id)
+        .single();
 
-    if (existing?.status === "paid") {
-      return res.json({ ok: true });
+      if (order?.status === "paid") {
+        return res.json({ received: true });
+      }
+
+      /* MARK PAID */
+      await supabase
+        .from("orders")
+        .update({
+          status: "paid",
+          stripe_session_id: session.id
+        })
+        .eq("id", order_id);
+
+      /* TRIGGER FULFILLMENT */
+      await fetch(`${BASE_URL}/fulfill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sku, order_id })
+      });
     }
 
-    /* mark paid */
-    await supabase
-      .from("orders")
-      .update({
-        status: "paid",
-        stripe_session_id: session.id
-      })
-      .eq("id", order_id);
+    res.json({ received: true });
 
-    /* trigger fulfillment */
-    await fetch(`${process.env.BASE_URL}/fulfill`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sku, order_id })
-    });
+  } catch (err) {
+    console.error("Webhook processing error:", err);
+    res.status(500).json({ error: "Webhook failure" });
   }
-
-  res.json({ received: true });
 });
 
 /* =========================
@@ -211,37 +240,44 @@ app.post("/fulfill", async (req, res) => {
     return res.status(404).json({ error: "Product not found" });
   }
 
-  /* send to supplier automation layer */
-  await fetch(process.env.SUPPLIER_WEBHOOK, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      sku,
-      order_id,
-      product_name: product.name,
-      supplier_url: product.supplier_url
-    })
-  });
+  try {
+    await fetch(SUPPLIER_WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sku,
+        order_id,
+        product_name: product.name,
+        supplier_url: product.supplier_url
+      })
+    });
 
-  /* update order */
-  await supabase
-    .from("orders")
-    .update({ status: "fulfilled" })
-    .eq("id", order_id);
+    await supabase
+      .from("orders")
+      .update({ status: "fulfilled" })
+      .eq("id", order_id);
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error("Fulfillment error:", err);
+    res.status(500).json({ error: "Fulfillment failed" });
+  }
 });
 
 /* =========================
-   5. IMPORT PIPELINE (AI STORE LAYER ENTRY POINT)
+   5. PRODUCT IMPORT PIPELINE (AI ENTRY)
 ========================= */
 app.post("/import-product", async (req, res) => {
   const ali = req.body;
 
   const cost = safeNumber(ali.price);
-  if (!cost) return res.status(400).json({ error: "Invalid price" });
 
-  const mapped = {
+  if (!cost) {
+    return res.status(400).json({ error: "Invalid price" });
+  }
+
+  const product = {
     sku: crypto.randomUUID(),
     name: ali.title,
     description: ali.description || "AI imported product",
@@ -255,11 +291,11 @@ app.post("/import-product", async (req, res) => {
 
   const { data, error } = await supabase
     .from("products")
-    .insert(mapped)
+    .insert(product)
     .select()
     .single();
 
-  if (error) return res.status(500).json(error);
+  if (error) return res.status(500).json({ error: error.message });
 
   res.json(data);
 });
@@ -267,6 +303,8 @@ app.post("/import-product", async (req, res) => {
 /* =========================
    START SERVER
 ========================= */
-app.listen(3000, () => {
-  console.log("🚀 Meridian Market OS running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Meridian Market OS running on port ${PORT}`);
 });
