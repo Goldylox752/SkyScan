@@ -1,21 +1,42 @@
 {
   "name": "skymaster-os-server",
   "version": "1.0.0",
+  "description": "Skymaster OS backend server for Stripe checkout, Supabase inventory, and automation workflows",
   "main": "server.js",
   "type": "module",
+
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "lint": "echo \"No lint configured yet\""
   },
+
   "dependencies": {
     "express": "^4.19.2",
     "cors": "^2.8.5",
-    "express-rate-limit": "^7.4.0"
+    "express-rate-limit": "^7.4.0",
+    "stripe": "^16.0.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5"
   },
+
   "devDependencies": {
     "nodemon": "^3.1.0"
   },
+
   "engines": {
     "node": ">=18"
-  }
+  },
+
+  "keywords": [
+    "stripe",
+    "supabase",
+    "ecommerce",
+    "saas",
+    "automation",
+    "backend"
+  ],
+
+  "author": "Skymaster OS",
+  "license": "MIT"
 }
