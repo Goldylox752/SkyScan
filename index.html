@@ -8,7 +8,7 @@
 
 <meta
   name="description"
-  content="Meridian Market by NorthSky is an AI-powered commerce engine that discovers, scores, and sells winning products automatically."
+  content="Luxury AI-powered commerce storefront by NorthSky with autonomous product intelligence and real-time product scoring."
 />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,23 +18,31 @@
 />
 
 <style>
+
 :root{
-  --bg:#060816;
-  --bg2:#0c1224;
-  --panel:rgba(255,255,255,0.04);
-  --panel2:rgba(255,255,255,0.06);
-  --border:rgba(255,255,255,0.08);
+  --bg:#eef3f7;
+  --bg2:#dce6ee;
 
-  --text:#eef4ff;
-  --muted:rgba(238,244,255,0.68);
+  --glass:rgba(255,255,255,0.45);
+  --glass-strong:rgba(255,255,255,0.7);
 
-  --blue:#4f7cff;
-  --blue2:#2563eb;
+  --border:rgba(255,255,255,0.55);
 
-  --green:#22c55e;
-  --gold:#fbbf24;
+  --text:#1b2431;
+  --muted:#607086;
 
-  --shadow:0 10px 40px rgba(0,0,0,0.45);
+  --silver:#cfd8e3;
+  --silver2:#f8fbff;
+
+  --aqua:#58d7ff;
+  --aqua2:#8cecff;
+
+  --shadow:
+    0 10px 30px rgba(0,0,0,.08),
+    0 2px 10px rgba(0,0,0,.04);
+
+  --glow:
+    0 0 40px rgba(88,215,255,.22);
 }
 
 *{
@@ -50,25 +58,64 @@ html{
 body{
   font-family:Inter,sans-serif;
   background:
-    radial-gradient(circle at top,#152348 0%,#0b1020 35%,#060816 100%);
+    radial-gradient(circle at top left,#ffffff 0%,#eef4fa 28%,#dde7f1 70%,#d3dce7 100%);
   color:var(--text);
   overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* BACKGROUND BLOBS */
+
+.bg-blur{
+  position:fixed;
+  border-radius:999px;
+  filter:blur(100px);
+  z-index:-1;
+  opacity:.55;
+}
+
+.blur1{
+  width:340px;
+  height:340px;
+  background:#aeefff;
+  top:-100px;
+  left:-80px;
+}
+
+.blur2{
+  width:420px;
+  height:420px;
+  background:#ffffff;
+  right:-120px;
+  top:80px;
+}
+
+.blur3{
+  width:320px;
+  height:320px;
+  background:#b7e7ff;
+  bottom:-120px;
+  left:40%;
 }
 
 /* NAV */
+
 nav{
   position:sticky;
   top:0;
   z-index:999;
-  backdrop-filter:blur(16px);
-  background:rgba(6,8,22,0.72);
-  border-bottom:1px solid var(--border);
+
+  backdrop-filter:blur(24px);
+  background:rgba(255,255,255,.38);
+
+  border-bottom:1px solid rgba(255,255,255,.5);
 }
 
 .nav-inner{
-  max-width:1280px;
+  max-width:1380px;
   margin:auto;
-  padding:18px 24px;
+
+  padding:18px 28px;
 
   display:flex;
   align-items:center;
@@ -76,80 +123,110 @@ nav{
 }
 
 .logo{
-  font-size:20px;
+  font-size:22px;
   font-weight:800;
-  letter-spacing:-0.4px;
+  letter-spacing:-1px;
 }
 
 .logo span{
-  color:var(--blue);
+  background:linear-gradient(
+    135deg,
+    #59d5ff,
+    #7cecff
+  );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 
 .nav-links{
   display:flex;
   align-items:center;
-  gap:20px;
+  gap:18px;
 }
 
 .nav-links a{
-  color:var(--muted);
   text-decoration:none;
+  color:var(--muted);
   font-size:14px;
+  font-weight:600;
   transition:.2s;
 }
 
 .nav-links a:hover{
-  color:white;
+  color:#1d2d3e;
 }
 
 .launch-btn{
-  background:linear-gradient(135deg,var(--blue),#6ea4ff);
-  color:white !important;
-  padding:11px 16px;
-  border-radius:12px;
-  font-weight:700;
-  box-shadow:0 8px 25px rgba(79,124,255,0.35);
+  padding:12px 18px;
+  border-radius:14px;
+
+  color:#0b1d2d !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.95),
+      rgba(161,240,255,.75)
+    );
+
+  border:1px solid rgba(255,255,255,.8);
+
+  box-shadow:
+    0 8px 24px rgba(88,215,255,.18);
+
+  backdrop-filter:blur(18px);
 }
 
 /* HERO */
+
 .hero{
-  max-width:1280px;
+  max-width:1380px;
   margin:auto;
 
   padding:
-    110px
-    24px
-    70px;
+    100px
+    28px
+    60px;
 
   display:grid;
   grid-template-columns:1.1fr .9fr;
-  gap:50px;
+  gap:48px;
   align-items:center;
 }
 
 .hero-left h1{
-  font-size:68px;
-  line-height:1;
-  letter-spacing:-2px;
+  font-size:78px;
+  line-height:.95;
+  letter-spacing:-4px;
   font-weight:800;
 }
 
 .hero-left h1 span{
-  background:linear-gradient(135deg,#8db5ff,#4f7cff);
+  background:
+    linear-gradient(
+      135deg,
+      #78e7ff,
+      #2ca9ff
+    );
+
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
 .hero-left p{
   margin-top:24px;
-  font-size:17px;
-  line-height:1.7;
+  max-width:760px;
+
   color:var(--muted);
-  max-width:720px;
+
+  font-size:17px;
+  line-height:1.8;
 }
 
 .hero-actions{
-  margin-top:30px;
+  margin-top:34px;
+
   display:flex;
   gap:14px;
   flex-wrap:wrap;
@@ -160,10 +237,10 @@ nav{
   align-items:center;
   justify-content:center;
 
-  padding:14px 18px;
-  border-radius:14px;
+  padding:15px 20px;
 
-  font-size:14px;
+  border-radius:18px;
+
   font-weight:700;
   text-decoration:none;
 
@@ -171,9 +248,19 @@ nav{
 }
 
 .primary{
-  background:linear-gradient(135deg,var(--blue),#6ea4ff);
-  color:white;
-  box-shadow:0 10px 30px rgba(79,124,255,.35);
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #b7eeff
+    );
+
+  color:#122434;
+
+  border:1px solid rgba(255,255,255,.85);
+
+  box-shadow:
+    0 12px 30px rgba(88,215,255,.18);
 }
 
 .primary:hover{
@@ -181,145 +268,221 @@ nav{
 }
 
 .secondary{
-  border:1px solid var(--border);
-  color:white;
-  background:rgba(255,255,255,0.03);
+  background:rgba(255,255,255,.28);
+
+  border:1px solid rgba(255,255,255,.6);
+
+  backdrop-filter:blur(20px);
+
+  color:#223345;
 }
 
 .secondary:hover{
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,.45);
 }
 
-/* AI PANEL */
+/* HERO PANEL */
+
 .hero-panel{
-  background:linear-gradient(
-    145deg,
-    rgba(255,255,255,0.06),
-    rgba(255,255,255,0.03)
-  );
+  position:relative;
 
-  border:1px solid var(--border);
-  border-radius:26px;
-  padding:24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.55),
+      rgba(255,255,255,.22)
+    );
 
-  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.75);
+
+  border-radius:34px;
+
+  padding:26px;
+
+  box-shadow:
+    var(--shadow),
+    var(--glow);
+
+  backdrop-filter:blur(28px);
+
+  overflow:hidden;
+}
+
+.hero-panel::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.5),
+      transparent
+    );
+
+  pointer-events:none;
+}
+
+.panel-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
 .panel-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  margin-bottom:18px;
-}
-
-.panel-title h3{
   font-size:18px;
+  font-weight:700;
 }
 
 .live{
   display:flex;
   align-items:center;
   gap:8px;
+
   font-size:12px;
-  color:#8fffc1;
+  font-weight:700;
+
+  color:#1eaed6;
 }
 
 .dot{
-  width:8px;
-  height:8px;
+  width:9px;
+  height:9px;
+
   border-radius:999px;
-  background:#22c55e;
-  box-shadow:0 0 12px #22c55e;
+
+  background:#59d5ff;
+
+  box-shadow:0 0 14px #59d5ff;
 }
 
 .metric-grid{
+  margin-top:22px;
+
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:14px;
+  gap:16px;
 }
 
 .metric{
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:18px;
-  padding:18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.42),
+      rgba(255,255,255,.2)
+    );
+
+  border:1px solid rgba(255,255,255,.55);
+
+  border-radius:24px;
+
+  padding:20px;
+
+  backdrop-filter:blur(18px);
 }
 
 .metric-value{
-  font-size:28px;
+  font-size:34px;
   font-weight:800;
 }
 
 .metric-label{
-  margin-top:4px;
+  margin-top:6px;
+
   color:var(--muted);
+
   font-size:12px;
 }
 
 /* SECTION */
+
 .section{
-  max-width:1280px;
+  max-width:1380px;
   margin:auto;
-  padding:20px 24px 70px;
+
+  padding:
+    20px
+    28px
+    80px;
 }
 
 .section-header{
-  margin-bottom:30px;
+  margin-bottom:34px;
 }
 
 .section-header h2{
-  font-size:34px;
-  letter-spacing:-1px;
+  font-size:42px;
+  letter-spacing:-2px;
 }
 
 .section-header p{
-  margin-top:10px;
+  margin-top:14px;
+
+  max-width:760px;
+
   color:var(--muted);
-  max-width:680px;
-  line-height:1.6;
+
+  line-height:1.7;
 }
 
 /* GRID */
+
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:22px;
+  grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+
+  gap:24px;
 }
 
-/* CARD */
-.card{
-  background:linear-gradient(
-    145deg,
-    rgba(17,24,39,0.92),
-    rgba(15,23,42,0.98)
-  );
+/* PRODUCT CARD */
 
-  border:1px solid var(--border);
-  border-radius:24px;
+.card{
+  position:relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.52),
+      rgba(255,255,255,.2)
+    );
+
+  border:1px solid rgba(255,255,255,.7);
+
+  border-radius:30px;
 
   overflow:hidden;
 
-  transition:.24s;
-  position:relative;
+  transition:.28s;
+
+  box-shadow:var(--shadow);
+
+  backdrop-filter:blur(24px);
+}
+
+.card:hover{
+  transform:translateY(-8px);
+
+  box-shadow:
+    0 18px 40px rgba(88,215,255,.18),
+    0 10px 24px rgba(0,0,0,.08);
 }
 
 .card::before{
   content:"";
+
   position:absolute;
   inset:0;
-  background:linear-gradient(
-    180deg,
-    rgba(255,255,255,0.06),
-    transparent
-  );
-  pointer-events:none;
-}
 
-.card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(79,124,255,.35);
-  box-shadow:0 20px 40px rgba(0,0,0,.35);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.28),
+      transparent
+    );
+
+  pointer-events:none;
 }
 
 .img-wrap{
@@ -328,64 +491,72 @@ nav{
 
 .img{
   width:100%;
-  height:260px;
+  height:280px;
   object-fit:cover;
-  background:#111827;
+
+  background:#dce4eb;
 }
+
+/* BADGES */
 
 .ai-badge{
   position:absolute;
-  top:14px;
-  left:14px;
+  top:18px;
+  left:18px;
 
-  background:rgba(15,23,42,.88);
-  border:1px solid rgba(255,255,255,.08);
+  padding:10px 14px;
 
-  color:#8db5ff;
+  border-radius:999px;
 
   font-size:11px;
   font-weight:700;
 
-  padding:8px 10px;
-  border-radius:999px;
+  background:rgba(255,255,255,.52);
 
-  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.75);
+
+  backdrop-filter:blur(14px);
+
+  color:#148db0;
 }
 
 .winner{
-  color:#34d399;
+  color:#00a870;
 }
 
 .content{
-  padding:18px;
+  padding:22px;
 }
 
 .title{
-  font-size:16px;
+  font-size:18px;
   font-weight:700;
-  line-height:1.4;
+  line-height:1.45;
 }
 
 .desc{
-  margin-top:10px;
+  margin-top:12px;
+
   color:var(--muted);
+
+  line-height:1.7;
   font-size:13px;
-  line-height:1.6;
-  min-height:60px;
 }
 
+/* META */
+
 .meta{
+  margin-top:22px;
+
   display:flex;
   justify-content:space-between;
   align-items:center;
-
-  margin-top:18px;
 }
 
 .price{
-  font-size:24px;
+  font-size:28px;
   font-weight:800;
-  color:var(--green);
+  color:#00a678;
 }
 
 .score{
@@ -399,152 +570,198 @@ nav{
 
 .score-value{
   margin-top:2px;
-  font-size:15px;
+
+  font-size:17px;
   font-weight:700;
-  color:#8db5ff;
+
+  color:#2ca9ff;
 }
 
+/* TAGS */
+
 .tags{
-  margin-top:16px;
+  margin-top:18px;
 
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:10px;
 }
 
 .tag{
-  padding:7px 10px;
+  padding:8px 12px;
+
   border-radius:999px;
 
-  background:#162033;
-  color:#b5cfff;
+  background:rgba(255,255,255,.38);
+
+  border:1px solid rgba(255,255,255,.65);
 
   font-size:11px;
-  font-weight:600;
+  font-weight:700;
+
+  color:#506072;
+
+  backdrop-filter:blur(10px);
 }
 
 .stock-low{
-  background:#3a1717;
-  color:#ffb4b4;
+  color:#c56a6a;
 }
 
+/* BUTTON */
+
 .buy{
-  margin-top:18px;
+  margin-top:22px;
 
   width:100%;
+
   border:none;
   cursor:pointer;
 
-  padding:14px;
-  border-radius:14px;
+  padding:15px;
+
+  border-radius:18px;
 
   font-weight:800;
   font-size:14px;
 
-  color:white;
+  color:#0f2430;
 
-  background:linear-gradient(
-    135deg,
-    var(--blue),
-    var(--blue2)
-  );
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #9cecff
+    );
+
+  border:1px solid rgba(255,255,255,.9);
+
+  box-shadow:
+    0 10px 24px rgba(88,215,255,.18);
 
   transition:.22s;
 }
 
 .buy:hover{
-  transform:translateY(-1px);
-  filter:brightness(1.05);
+  transform:translateY(-2px);
 }
 
 .buy:disabled{
-  background:#374151;
+  background:#d1d7dd;
+  color:#6b7280;
   cursor:not-allowed;
-}
-
-/* EMPTY */
-.empty{
-  text-align:center;
-  padding:60px 20px;
-  color:var(--muted);
+  box-shadow:none;
 }
 
 /* LOADING */
+
 .loading-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:22px;
+  grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+
+  gap:24px;
 }
 
 .skeleton{
-  height:420px;
-  border-radius:24px;
+  height:480px;
 
-  background:linear-gradient(
-    90deg,
-    #111827,
-    #1f2937,
-    #111827
-  );
+  border-radius:30px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.35),
+      rgba(255,255,255,.7),
+      rgba(255,255,255,.35)
+    );
 
   background-size:200% 100%;
+
   animation:shimmer 1.4s infinite;
 }
 
 @keyframes shimmer{
-  0%{background-position:200% 0}
-  100%{background-position:-200% 0}
+  0%{
+    background-position:200% 0;
+  }
+
+  100%{
+    background-position:-200% 0;
+  }
+}
+
+/* EMPTY */
+
+.empty{
+  padding:80px 20px;
+  text-align:center;
+  color:var(--muted);
 }
 
 /* FOOTER */
-footer{
-  border-top:1px solid var(--border);
 
-  margin-top:60px;
-  padding:40px 24px;
+footer{
+  margin-top:70px;
+
+  padding:50px 24px;
 
   text-align:center;
+
   color:var(--muted);
-  font-size:13px;
+
+  border-top:1px solid rgba(255,255,255,.45);
+
+  background:rgba(255,255,255,.18);
+
+  backdrop-filter:blur(18px);
 }
 
 /* MOBILE */
+
 @media(max-width:980px){
 
   .hero{
     grid-template-columns:1fr;
-    padding-top:80px;
+    padding-top:70px;
   }
 
   .hero-left h1{
-    font-size:52px;
+    font-size:58px;
   }
 }
 
 @media(max-width:640px){
 
+  .hero-left h1{
+    font-size:44px;
+    letter-spacing:-2px;
+  }
+
+  .section-header h2{
+    font-size:32px;
+  }
+
   .nav-links{
-    gap:12px;
+    gap:10px;
   }
 
   .nav-links a{
     font-size:12px;
   }
-
-  .hero-left h1{
-    font-size:42px;
-  }
-
-  .section-header h2{
-    font-size:28px;
-  }
 }
+
 </style>
 </head>
 
 <body>
 
+<div class="bg-blur blur1"></div>
+<div class="bg-blur blur2"></div>
+<div class="bg-blur blur3"></div>
+
 <nav>
+
   <div class="nav-inner">
 
     <div class="logo">
@@ -554,10 +771,15 @@ footer{
     <div class="nav-links">
       <a href="#products-section">Products</a>
       <a href="#intelligence">AI Engine</a>
-      <a href="#" class="launch-btn">Launch System</a>
+      <a href="#">Analytics</a>
+
+      <a href="#" class="launch-btn">
+        Launch System
+      </a>
     </div>
 
   </div>
+
 </nav>
 
 <section class="hero">
@@ -565,17 +787,19 @@ footer{
   <div class="hero-left">
 
     <h1>
-      AI Powered
+      Luxury AI
       <span>Commerce Intelligence</span>
     </h1>
 
     <p>
-      Meridian Market by NorthSky continuously discovers, scores,
-      and launches high-converting products using autonomous
-      product mining, real-time analytics, and AI sales feedback loops.
+      Meridian Market by NorthSky autonomously discovers,
+      scores, and launches premium products using
+      real-time AI analytics, autonomous product mining,
+      and adaptive sales intelligence.
     </p>
 
     <div class="hero-actions">
+
       <a href="#products-section" class="btn primary">
         Explore Products
       </a>
@@ -583,41 +807,54 @@ footer{
       <a href="#" class="btn secondary">
         View AI Engine
       </a>
+
     </div>
 
   </div>
 
   <div class="hero-panel">
 
-    <div class="panel-title">
-      <h3>AI Commerce Engine</h3>
+    <div class="panel-top">
+
+      <div class="panel-title">
+        NorthSky Intelligence Layer
+      </div>
 
       <div class="live">
         <div class="dot"></div>
         LIVE
       </div>
+
     </div>
 
     <div class="metric-grid">
 
       <div class="metric">
         <div class="metric-value">247</div>
-        <div class="metric-label">Products Analyzed</div>
+        <div class="metric-label">
+          Products Analyzed
+        </div>
       </div>
 
       <div class="metric">
         <div class="metric-value">91%</div>
-        <div class="metric-label">AI Accuracy</div>
+        <div class="metric-label">
+          AI Accuracy
+        </div>
       </div>
 
       <div class="metric">
         <div class="metric-value">18</div>
-        <div class="metric-label">Winning Products</div>
+        <div class="metric-label">
+          Winning Products
+        </div>
       </div>
 
       <div class="metric">
         <div class="metric-value">$42k</div>
-        <div class="metric-label">Revenue Tracked</div>
+        <div class="metric-label">
+          Revenue Tracked
+        </div>
       </div>
 
     </div>
@@ -629,13 +866,18 @@ footer{
 <section class="section" id="products-section">
 
   <div class="section-header">
-    <h2>AI Selected Products</h2>
+
+    <h2>
+      AI Selected Products
+    </h2>
 
     <p>
-      Every product is analyzed through Meridian’s autonomous
-      scoring engine using pricing velocity, engagement,
-      conversion potential, and trend intelligence.
+      Every product is analyzed through Meridian’s
+      autonomous scoring engine using engagement velocity,
+      conversion probability, pricing intelligence,
+      and live market trend data.
     </p>
+
   </div>
 
   <div id="products" class="loading-grid">
@@ -649,34 +891,37 @@ footer{
 </section>
 
 <footer>
-  © 2026 Meridian Market by NorthSky — Autonomous AI Commerce Infrastructure
+  © 2026 Meridian Market by NorthSky — Luxury Autonomous Commerce Infrastructure
 </footer>
 
 <script>
+
 const API = "https://skyscan-ccjt.onrender.com";
 
 /* LOAD PRODUCTS */
 async function loadProducts(){
 
-  const container = document.getElementById("products");
+  const container =
+    document.getElementById("products");
 
   try{
 
-    const res = await fetch(`${API}/products`, {
-      method:"GET",
-      headers:{
-        "Content-Type":"application/json"
-      }
-    });
+    const res = await fetch(
+      `${API}/products`
+    );
 
     if(!res.ok){
-      throw new Error(`API Error ${res.status}`);
+      throw new Error(
+        `API Error ${res.status}`
+      );
     }
 
     const products = await res.json();
 
     if(!Array.isArray(products)){
-      throw new Error("Invalid products");
+      throw new Error(
+        "Invalid products"
+      );
     }
 
     if(products.length === 0){
@@ -692,12 +937,17 @@ async function loadProducts(){
 
     container.className = "grid";
 
-    container.innerHTML = products.map(p => {
+    container.innerHTML =
+      products.map(p => {
 
-      const lowStock = Number(p.stock) <= 5;
-      const winner = Number(p.score || 0) >= 80;
+      const lowStock =
+        Number(p.stock) <= 5;
+
+      const winner =
+        Number(p.score || 0) >= 80;
 
       return `
+
         <div class="card">
 
           <div class="img-wrap">
@@ -708,12 +958,16 @@ async function loadProducts(){
               loading="lazy"
 
               onerror="
-                this.src='https://placehold.co/600x600/111827/FFFFFF?text=Meridian+Market'
+                this.src='https://placehold.co/600x600/e5edf4/1f2937?text=Meridian+Market'
               "
             />
 
             <div class="ai-badge ${winner ? 'winner' : ''}">
-              ${winner ? 'AI WINNER' : 'AI VERIFIED'}
+              ${
+                winner
+                ? 'AI WINNER'
+                : 'AI VERIFIED'
+              }
             </div>
 
           </div>
@@ -727,17 +981,20 @@ async function loadProducts(){
             <div class="desc">
               ${escapeHtml(
                 p.description ||
-                "AI selected product optimized for conversion."
+                "AI selected product optimized for premium conversion."
               )}
             </div>
 
             <div class="meta">
 
               <div class="price">
-                $${Number(p.price || 0).toFixed(2)}
+                $${Number(
+                  p.price || 0
+                ).toFixed(2)}
               </div>
 
               <div class="score">
+
                 <div class="score-label">
                   AI SCORE
                 </div>
@@ -745,6 +1002,7 @@ async function loadProducts(){
                 <div class="score-value">
                   ${p.score || "N/A"}
                 </div>
+
               </div>
 
             </div>
@@ -752,7 +1010,11 @@ async function loadProducts(){
             <div class="tags">
 
               <div class="tag ${lowStock ? 'stock-low' : ''}">
-                ${lowStock ? 'Low Stock' : 'In Stock'}
+                ${
+                  lowStock
+                  ? 'Low Stock'
+                  : 'In Stock'
+                }
               </div>
 
               <div class="tag">
@@ -763,8 +1025,14 @@ async function loadProducts(){
 
             <button
               class="buy"
+
               onclick="buy('${p.sku}')"
-              ${Number(p.stock) <= 0 ? 'disabled' : ''}
+
+              ${
+                Number(p.stock) <= 0
+                ? 'disabled'
+                : ''
+              }
             >
               ${
                 Number(p.stock) <= 0
@@ -776,6 +1044,7 @@ async function loadProducts(){
           </div>
 
         </div>
+
       `;
 
     }).join("");
@@ -797,31 +1066,46 @@ async function buy(sku){
 
   try{
 
-    const res = await fetch(`${API}/create-checkout`, {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({ sku })
-    });
+    const res = await fetch(
+      `${API}/create-checkout`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+          sku
+        })
+      }
+    );
 
     if(!res.ok){
-      throw new Error("Checkout failed");
+      throw new Error(
+        "Checkout failed"
+      );
     }
 
     const data = await res.json();
 
     if(data.url){
-      window.location.href = data.url;
+
+      window.location.href =
+        data.url;
+
     } else {
-      alert("Stripe checkout unavailable");
+
+      alert(
+        "Stripe checkout unavailable"
+      );
     }
 
   } catch(err){
 
     console.error(err);
-    alert("Network error");
 
+    alert("Network error");
   }
 }
 
@@ -836,6 +1120,7 @@ function escapeHtml(str){
 }
 
 loadProducts();
+
 </script>
 
 </body>
