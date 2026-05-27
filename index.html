@@ -3,16 +3,35 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RoofFlow Store</title>
+
+<title>Meridian Market</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
 
 <style>
+:root{
+  --bg:#0a0c15;
+  --panel:#111827;
+  --border:rgba(255,255,255,0.06);
+  --green:#4ade80;
+  --blue:#2563eb;
+  --muted:rgba(255,255,255,0.7);
+}
+
 body{
   margin:0;
   font-family:Inter,sans-serif;
-  background:#0a0c15;
+  background:var(--bg);
   color:white;
+}
+
+/* TOP BAR */
+.topbar{
+  padding:10px;
+  text-align:center;
+  font-size:12px;
+  background:#0f172a;
+  border-bottom:1px solid var(--border);
 }
 
 /* HEADER */
@@ -21,8 +40,15 @@ body{
   margin:auto;
   padding:40px 20px 10px;
 }
-.header h1{font-size:32px;margin:0;}
-.header p{opacity:.7}
+
+.header h1{
+  margin:0;
+  font-size:34px;
+}
+
+.header p{
+  color:var(--muted);
+}
 
 /* GRID */
 .container{
@@ -34,19 +60,20 @@ body{
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:22px;
+  gap:20px;
 }
 
 /* CARD */
 .card{
   background:linear-gradient(145deg,#111827,#0f172a);
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:20px;
+  border:1px solid var(--border);
+  border-radius:18px;
   overflow:hidden;
   transition:.2s;
   display:flex;
   flex-direction:column;
 }
+
 .card:hover{
   transform:translateY(-4px);
   border-color:#2563eb55;
@@ -60,15 +87,24 @@ body{
 }
 
 .content{
-  padding:16px;
+  padding:14px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
 
-.title{font-size:18px;font-weight:700;}
-.desc{font-size:13px;opacity:.75;line-height:1.4;}
+.title{
+  font-size:16px;
+  font-weight:700;
+}
 
+.desc{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+/* META ROW */
 .row{
   display:flex;
   justify-content:space-between;
@@ -76,22 +112,27 @@ body{
 }
 
 .price{
-  color:#4ade80;
+  color:var(--green);
   font-weight:800;
-  font-size:18px;
 }
 
-.stock{
-  font-size:12px;
-  opacity:.7;
+.score{
+  font-size:11px;
+  color:#93c5fd;
 }
 
+/* BADGES */
 .badge{
   font-size:11px;
-  padding:4px 10px;
+  padding:4px 8px;
   border-radius:999px;
   background:#1f2937;
   display:inline-block;
+}
+
+.winner{
+  background:#064e3b;
+  color:#34d399;
 }
 
 /* BUTTON */
@@ -102,12 +143,11 @@ body{
   border:none;
   cursor:pointer;
   font-weight:800;
-  margin-top:8px;
   transition:.2s;
 }
 
 .buy{
-  background:#2563eb;
+  background:var(--blue);
   color:white;
 }
 
@@ -121,25 +161,25 @@ body{
   cursor:not-allowed;
 }
 
-/* TOP BAR */
-.topbar{
-  background:#0f172a;
-  padding:10px;
-  text-align:center;
-  font-size:13px;
-  border-bottom:1px solid #1f2937;
+/* LOADING */
+.skeleton{
+  height:260px;
+  border-radius:18px;
+  background:linear-gradient(90deg,#111827,#1f2937,#111827);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
 }
 
-/* EMPTY STATE */
+@keyframes shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+
+/* EMPTY */
 .empty{
-  opacity:.7;
   text-align:center;
   padding:40px;
-}
-
-/* MOBILE */
-@media(max-width:600px){
-  .header h1{font-size:24px;}
+  opacity:.7;
 }
 </style>
 </head>
@@ -147,17 +187,19 @@ body{
 <body>
 
 <div class="topbar">
-  🚀 RoofFlow Store • Live inventory • Stripe checkout • Dropshipping ready
+  🤖 Meridian Market AI Layer • Live product intelligence • Auto checkout ready
 </div>
 
 <div class="header">
-  <h1>RoofFlow Store</h1>
-  <p>Professional tools for contractors & roofing companies</p>
+  <h1>Meridian Market</h1>
+  <p>AI-powered product intelligence engine for high-margin dropshipping</p>
 </div>
 
 <div class="container">
   <div id="products" class="grid">
-    <div class="empty">Loading products...</div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
   </div>
 </div>
 
@@ -166,47 +208,51 @@ const API = "https://YOUR-BACKEND.com";
 
 /* LOAD PRODUCTS */
 async function loadProducts(){
-  try {
+  try{
     const res = await fetch(`${API}/products`);
     const products = await res.json();
 
     const container = document.getElementById("products");
 
-    if (!products || products.length === 0) {
+    if(!products || !products.length){
       container.innerHTML = `<div class="empty">No products found</div>`;
       return;
     }
 
     container.innerHTML = products.map(p => {
       const lowStock = p.stock <= 5;
+      const winner = p.score && p.score > 80;
 
       return `
-      <div class="card">
-        <img class="img" src="${p.image_url}" loading="lazy"/>
+        <div class="card">
+          <img class="img" src="${escapeHtml(p.image_url)}"/>
 
-        <div class="content">
+          <div class="content">
 
-          <div class="title">${escapeHtml(p.name)}</div>
-          <div class="desc">${escapeHtml(p.description || "")}</div>
+            <div class="title">${escapeHtml(p.name)}</div>
+            <div class="desc">${escapeHtml(p.description || "")}</div>
 
-          <div class="row">
-            <div class="price">$${Number(p.price).toFixed(2)}</div>
-            <div class="stock">
-              ${lowStock ? "⚠️ Low stock" : "Stock: " + p.stock}
+            <div class="row">
+              <div class="price">$${Number(p.price).toFixed(2)}</div>
+              <div class="score">
+                Score: ${p.score || "N/A"}
+              </div>
             </div>
+
+            <div class="row">
+              <div class="badge">${lowStock ? "⚠️ Low stock" : "In stock"}</div>
+              ${winner ? `<div class="badge winner">WINNER</div>` : ""}
+            </div>
+
+            <button class="btn buy"
+              onclick="buy('${p.sku}')"
+              ${p.stock <= 0 ? "disabled" : ""}
+            >
+              ${p.stock <= 0 ? "Out of Stock" : "Buy Now"}
+            </button>
+
           </div>
-
-          ${lowStock ? `<div class="badge">🔥 Selling fast</div>` : ""}
-
-          <button class="btn buy"
-            onclick="buy('${p.sku}')"
-            ${p.stock <= 0 ? "disabled" : ""}
-          >
-            ${p.stock <= 0 ? "Out of Stock" : "Buy Now"}
-          </button>
-
         </div>
-      </div>
       `;
     }).join("");
 
@@ -216,9 +262,9 @@ async function loadProducts(){
   }
 }
 
-/* BUY FLOW */
+/* CHECKOUT */
 async function buy(sku){
-  try {
+  try{
     const res = await fetch(`${API}/create-checkout`, {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
@@ -227,18 +273,18 @@ async function buy(sku){
 
     const data = await res.json();
 
-    if (data.url) {
+    if(data.url){
       window.location.href = data.url;
     } else {
       alert("Checkout failed");
     }
 
-  } catch(err){
+  }catch(e){
     alert("Network error");
   }
 }
 
-/* SECURITY */
+/* SAFE RENDER */
 function escapeHtml(str){
   return String(str || "")
     .replaceAll("&","&amp;")
