@@ -1,12 +1,17 @@
 app.post("/create-checkout", async (req, res) => {
+  const requestId = crypto.randomUUID();
+
   try {
     const { sku } = req.body;
 
     if (!sku) {
-      return res.status(400).json({ error: "Missing SKU" });
+      return res.status(400).json({
+        error: "Missing SKU",
+        requestId
+      });
     }
 
-    // Fetch product
+    // 1. Get product
     const { data: product, error } = await supabase
       .from("products")
       .select("*")
@@ -14,15 +19,50 @@ app.post("/create-checkout", async (req, res) => {
       .single();
 
     if (error || !product) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({
+        error: "Product not found",
+        requestId
+      });
     }
 
-    // Stock validation
-    if (product.stock === 0) {
-      return res.status(400).json({ error: "Out of stock" });
+    if (product.stock <= 0) {
+      return res.status(400).json({
+        error: "Out of stock",
+        requestId
+      });
     }
 
-    // Create Stripe session
+    const price = Number(product.price);
+    if (!price) {
+      return res.status(500).json({
+        error: "Invalid price",
+        requestId
+      });
+    }
+
+    // 2. Create pending order FIRST (this is what you were missing)
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert([
+        {
+          sku: product.sku,
+          product_id: product.id,
+          status: "pending",
+          amount: price,
+          request_id: requestId
+        }
+      ])
+      .select()
+      .single();
+
+    if (orderError) {
+      return res.status(500).json({
+        error: "Failed to create order",
+        requestId
+      });
+    }
+
+    // 3. Create Stripe session
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -35,7 +75,7 @@ app.post("/create-checkout", async (req, res) => {
               name: product.name,
               description: product.description || "Premium product"
             },
-            unit_amount: Math.round(Number(product.price) * 100)
+            unit_amount: Math.round(price * 100)
           },
           quantity: 1
         }
@@ -43,22 +83,34 @@ app.post("/create-checkout", async (req, res) => {
 
       metadata: {
         sku: product.sku,
-        product_id: product.id
+        product_id: product.id,
+        order_id: order.id,
+        request_id: requestId
       },
 
       success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`
     });
 
-    return res.status(200).json({
-      url: session.url
+    // 4. Update order with session id
+    await supabase
+      .from("orders")
+      .update({
+        stripe_session_id: session.id
+      })
+      .eq("id", order.id);
+
+    return res.json({
+      url: session.url,
+      requestId
     });
 
   } catch (err) {
-    console.error("Checkout Error:", err);
+    console.error("Checkout error:", err);
 
     return res.status(500).json({
-      error: "Internal server error"
+      error: "Server error",
+      requestId
     });
   }
 });
