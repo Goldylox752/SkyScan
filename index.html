@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Meridian Market × MacFlip AI</title>
+<title>Meridian Market</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
@@ -16,7 +16,6 @@
   --text:#e8edf5;
   --muted:#8a97ab;
   --accent:#00e5a0;
-  --accent2:#00b6ff;
 }
 
 body{
@@ -39,7 +38,6 @@ nav{
 }
 
 .logo{font-weight:800}
-.logo span{color:var(--muted)}
 
 /* HERO */
 .hero{
@@ -141,12 +139,12 @@ button{
 <body>
 
 <nav>
-  <div class="logo">Meridian <span>× MacFlip AI</span></div>
+  <div class="logo">Meridian Market</div>
 </nav>
 
 <section class="hero">
-  <h1>AI Sales + AI Deal Finder<br>In One System</h1>
-  <p>Meridian handles customers. MacFlip finds profit. One SaaS stack.</p>
+  <h1>AI Sales + Deal Intelligence<br>In One System</h1>
+  <p>Meridian Market automates customer conversations and surfaces high-margin opportunities in real time.</p>
 </section>
 
 <div class="grid">
@@ -158,14 +156,14 @@ button{
     <div class="chat-body" id="chat"></div>
 
     <div class="input">
-      <input id="msg" placeholder="Talk to AI..." />
+      <input id="msg" placeholder="Talk to Meridian AI..." />
       <button onclick="send()">Send</button>
     </div>
   </div>
 
   <!-- DEAL ENGINE -->
   <div class="panel">
-    <h3>MacFlip Deal Feed</h3>
+    <h3>Deal Intelligence Feed</h3>
     <div id="deals"></div>
   </div>
 
@@ -177,7 +175,7 @@ const chat = document.getElementById("chat");
 const deals = document.getElementById("deals");
 const msg = document.getElementById("msg");
 
-/* CHAT */
+/* CHAT UI */
 function add(el,text,type){
   const d=document.createElement("div");
   d.className="msg "+type;
@@ -185,30 +183,34 @@ function add(el,text,type){
   el.appendChild(d);
 }
 
-/* AI SALES */
+/* AI LOGIC */
 function ai(text){
+  text = text.toLowerCase();
+
   if(text.includes("price")){
-    return "Our system is $9.99/month with real-time profit alerts.";
+    return "Meridian Market starts at $9.99/month with real-time deal alerts and AI sales automation.";
   }
-  if(text.includes("book")){
-    return "Great — I can book you a demo. What's your email?";
+
+  if(text.includes("demo") || text.includes("book")){
+    return "Great — I can set up a demo. What email should I use?";
   }
-  return "Are you looking to increase sales or find profitable MacBook flips?";
+
+  return "Are you trying to increase sales conversion or discover high-margin opportunities?";
 }
 
 /* SEND */
 function send(){
-  const t=msg.value;
+  const t = msg.value;
   if(!t) return;
 
   add(chat,t,"user");
   msg.value="";
 
-  const reply=ai(t);
+  const reply = ai(t);
   add(chat,reply,"ai");
 }
 
-/* MOCK DEAL ENGINE */
+/* DEAL ENGINE */
 function loadDeals(){
   const sample=[
     {title:"MacBook Air M1",profit:120},
@@ -223,7 +225,7 @@ function loadDeals(){
     div.className="deal";
     div.innerHTML=`
       <b>${d.title}</b><br>
-      <span class="profit">+$${d.profit} profit</span>
+      <span class="profit">+$${d.profit} estimated margin</span>
     `;
     deals.appendChild(div);
   });
