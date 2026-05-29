@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Meridian Market — AI Sales Chat</title>
+
+<title>Meridian Market × MacFlip AI</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
@@ -15,17 +16,17 @@
   --text:#e8edf5;
   --muted:#8a97ab;
   --accent:#00e5a0;
+  --accent2:#00b6ff;
 }
 
-/* BASE */
 body{
   margin:0;
-  font-family:Syne, sans-serif;
+  font-family:Syne,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
-/* NAV */
+/* HEADER */
 nav{
   display:flex;
   justify-content:space-between;
@@ -36,6 +37,7 @@ nav{
   background:rgba(10,12,15,.9);
   backdrop-filter:blur(20px);
 }
+
 .logo{font-weight:800}
 .logo span{color:var(--muted)}
 
@@ -43,68 +45,40 @@ nav{
 .hero{
   max-width:900px;
   margin:auto;
-  padding:90px 24px;
+  padding:80px 24px 30px;
+  text-align:center;
 }
+
 .hero h1{
-  font-size:56px;
-  line-height:1;
+  font-size:52px;
+  line-height:1.1;
 }
+
 .hero p{
   color:var(--muted);
   margin-top:14px;
 }
 
-/* CHAT BUTTON */
-.chat-bubble{
-  position:fixed;
-  bottom:24px;
-  right:24px;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  background:var(--accent);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:800;
-  color:#000;
-  box-shadow:0 10px 30px rgba(0,229,160,.3);
-  z-index:9999;
+/* LAYOUT GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  max-width:1100px;
+  margin:40px auto;
+  padding:0 24px;
 }
 
-/* CHAT WINDOW */
-.chat-window{
-  position:fixed;
-  bottom:100px;
-  right:24px;
-  width:380px;
-  height:540px;
+.panel{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:16px;
-  display:none;
-  flex-direction:column;
-  overflow:hidden;
-  z-index:9999;
+  padding:18px;
 }
 
-.chat-window.open{display:flex}
-
-.chat-header{
-  padding:14px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.chat-title{font-weight:700}
-.chat-close{cursor:pointer;color:var(--muted)}
-
-/* MESSAGES */
+/* CHAT */
 .chat-body{
-  flex:1;
-  padding:14px;
+  height:260px;
   overflow:auto;
   display:flex;
   flex-direction:column;
@@ -112,10 +86,14 @@ nav{
 }
 
 .msg{
-  max-width:80%;
-  padding:10px 12px;
-  border-radius:10px;
   font-size:13px;
+  padding:10px;
+  border-radius:10px;
+}
+
+.ai{
+  background:rgba(0,229,160,.1);
+  border:1px solid rgba(0,229,160,.2);
 }
 
 .user{
@@ -123,31 +101,37 @@ nav{
   align-self:flex-end;
 }
 
-.ai{
-  background:rgba(0,229,160,.1);
-  border:1px solid rgba(0,229,160,.2);
-  align-self:flex-start;
+/* DEALS */
+.deal{
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+.profit{
+  color:var(--accent);
+  font-weight:700;
 }
 
 /* INPUT */
-.chat-input{
+.input{
   display:flex;
-  border-top:1px solid var(--border);
+  margin-top:10px;
 }
 
-.chat-input input{
+input{
   flex:1;
-  padding:12px;
+  padding:10px;
   border:none;
-  outline:none;
   background:#0f131a;
-  color:var(--text);
+  color:white;
 }
 
-.chat-input button{
+button{
   background:var(--accent);
   border:none;
-  padding:0 16px;
+  padding:10px 14px;
   font-weight:700;
   cursor:pointer;
 }
@@ -157,127 +141,96 @@ nav{
 <body>
 
 <nav>
-  <div class="logo">Meridian <span>AI Sales</span></div>
+  <div class="logo">Meridian <span>× MacFlip AI</span></div>
 </nav>
 
 <section class="hero">
-  <h1>AI That Sells For You<br>24/7 On Your Website</h1>
-  <p>
-    Replace chat tools like Intercom with an AI sales agent that qualifies visitors,
-    collects leads, and books calls automatically.
-  </p>
+  <h1>AI Sales + AI Deal Finder<br>In One System</h1>
+  <p>Meridian handles customers. MacFlip finds profit. One SaaS stack.</p>
 </section>
 
-<!-- FLOAT CHAT BUTTON -->
-<div class="chat-bubble" onclick="toggleChat()">AI</div>
+<div class="grid">
 
-<!-- CHAT WINDOW -->
-<div class="chat-window" id="chatWindow">
+  <!-- CHAT ENGINE -->
+  <div class="panel">
+    <h3>AI Sales Agent</h3>
 
-  <div class="chat-header">
-    <div class="chat-title">Meridian AI Sales</div>
-    <div class="chat-close" onclick="toggleChat()">✕</div>
+    <div class="chat-body" id="chat"></div>
+
+    <div class="input">
+      <input id="msg" placeholder="Talk to AI..." />
+      <button onclick="send()">Send</button>
+    </div>
   </div>
 
-  <div class="chat-body" id="chatBody">
-    <div class="msg ai">Hey 👋 I can help you find winning products or book a demo. What are you looking for?</div>
-  </div>
-
-  <div class="chat-input">
-    <input id="input" placeholder="Type a message..." />
-    <button onclick="sendMsg()">Send</button>
+  <!-- DEAL ENGINE -->
+  <div class="panel">
+    <h3>MacFlip Deal Feed</h3>
+    <div id="deals"></div>
   </div>
 
 </div>
 
 <script>
-const chatWindow = document.getElementById("chatWindow");
-const chatBody = document.getElementById("chatBody");
-const input = document.getElementById("input");
 
-/* 🔥 LEAD STATE */
-let lead = {
-  email: null,
-  stage: 0,
-  intent: "cold"
-};
+const chat = document.getElementById("chat");
+const deals = document.getElementById("deals");
+const msg = document.getElementById("msg");
 
-function toggleChat(){
-  chatWindow.classList.toggle("open");
+/* CHAT */
+function add(el,text,type){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.innerText=text;
+  el.appendChild(d);
 }
 
-/* ADD MESSAGE */
-function addMsg(text, type){
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.innerText = text;
-  chatBody.appendChild(div);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-/* INTENT ENGINE */
-function detectIntent(text){
-  text = text.toLowerCase();
-  if(text.includes("book") || text.includes("call")) return "hot";
-  if(text.includes("price") || text.includes("cost")) return "buy";
-  if(text.includes("how") || text.includes("works")) return "warm";
-  return "cold";
-}
-
-/* 🔥 AI SALES ENGINE */
-function salesEngine(text){
-
-  const intent = detectIntent(text);
-  lead.intent = intent;
-
-  /* STAGE 0 — QUALIFY */
-  if(lead.stage === 0){
-    lead.stage++;
-
-    if(intent === "hot"){
-      return "Perfect — I can get you booked. What’s your email?";
-    }
-
-    return "Are you trying to find winning products or book a demo call?";
+/* AI SALES */
+function ai(text){
+  if(text.includes("price")){
+    return "Our system is $9.99/month with real-time profit alerts.";
   }
-
-  /* STAGE 1 — EMAIL CAPTURE */
-  if(lead.stage === 1){
-    if(text.includes("@")){
-      lead.email = text;
-      lead.stage++;
-      return "Got it. Want me to show top winning products or book your strategy call?";
-    }
-    return "Drop your email so I can send results.";
+  if(text.includes("book")){
+    return "Great — I can book you a demo. What's your email?";
   }
-
-  /* STAGE 2 — CLOSE */
-  if(lead.stage === 2){
-    if(intent === "hot" || text.includes("book")){
-      return "Done. Book your call here 👇\nhttps://calendly.com/your-link";
-    }
-    return "I recommend starting with a free strategy call — want me to book you in?";
-  }
-
-  return "Tell me what you're trying to achieve — I’ll guide you.";
+  return "Are you looking to increase sales or find profitable MacBook flips?";
 }
 
-/* SEND MESSAGE */
-function sendMsg(){
-  const text = input.value;
-  if(!text) return;
+/* SEND */
+function send(){
+  const t=msg.value;
+  if(!t) return;
 
-  addMsg(text, "user");
-  input.value = "";
+  add(chat,t,"user");
+  msg.value="";
 
-  addMsg("Thinking...", "ai");
-
-  setTimeout(() => {
-    chatBody.lastChild.remove();
-    const reply = salesEngine(text);
-    addMsg(reply, "ai");
-  }, 600);
+  const reply=ai(t);
+  add(chat,reply,"ai");
 }
+
+/* MOCK DEAL ENGINE */
+function loadDeals(){
+  const sample=[
+    {title:"MacBook Air M1",profit:120},
+    {title:"MacBook Pro 2019",profit:90},
+    {title:"MacBook Air 2020",profit:150}
+  ];
+
+  deals.innerHTML="";
+
+  sample.forEach(d=>{
+    const div=document.createElement("div");
+    div.className="deal";
+    div.innerHTML=`
+      <b>${d.title}</b><br>
+      <span class="profit">+$${d.profit} profit</span>
+    `;
+    deals.appendChild(div);
+  });
+}
+
+loadDeals();
+
 </script>
 
 </body>
