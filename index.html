@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Meridian Market</title>
+<title>Meridian Market — Commerce OS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
@@ -12,10 +12,12 @@
 :root{
   --bg:#0a0c0f;
   --surface:#141820;
+  --panel:#10141c;
   --border:rgba(255,255,255,.08);
   --text:#e8edf5;
   --muted:#8a97ab;
   --accent:#00e5a0;
+  --blue:#00b6ff;
 }
 
 body{
@@ -25,10 +27,11 @@ body{
   color:var(--text);
 }
 
-/* HEADER */
+/* NAV */
 nav{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   padding:18px 24px;
   border-bottom:1px solid var(--border);
   position:sticky;
@@ -37,7 +40,10 @@ nav{
   backdrop-filter:blur(20px);
 }
 
-.logo{font-weight:800}
+.logo{
+  font-weight:800;
+  letter-spacing:.5px;
+}
 
 /* HERO */
 .hero{
@@ -48,21 +54,22 @@ nav{
 }
 
 .hero h1{
-  font-size:52px;
-  line-height:1.1;
+  font-size:54px;
+  line-height:1.05;
 }
 
 .hero p{
   color:var(--muted);
   margin-top:14px;
+  font-size:15px;
 }
 
-/* LAYOUT GRID */
+/* MAIN GRID */
 .grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1.2fr .8fr;
   gap:20px;
-  max-width:1100px;
+  max-width:1200px;
   margin:40px auto;
   padding:0 24px;
 }
@@ -74,8 +81,32 @@ nav{
   padding:18px;
 }
 
-/* CHAT */
-.chat-body{
+/* STORE GRID */
+.products{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.product{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+}
+
+.product b{
+  display:block;
+}
+
+.tag{
+  color:var(--accent);
+  font-weight:700;
+  font-size:13px;
+}
+
+/* AI PANEL */
+.chat{
   height:260px;
   overflow:auto;
   display:flex;
@@ -90,7 +121,7 @@ nav{
 }
 
 .ai{
-  background:rgba(0,229,160,.1);
+  background:rgba(0,229,160,.08);
   border:1px solid rgba(0,229,160,.2);
 }
 
@@ -99,37 +130,49 @@ nav{
   align-self:flex-end;
 }
 
-/* DEALS */
-.deal{
-  padding:10px;
+/* PRICING */
+.pricing{
+  max-width:1200px;
+  margin:80px auto;
+  padding:0 24px;
+}
+
+.pricing h2{
+  text-align:center;
+  font-size:38px;
+}
+
+.pricing p{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:40px;
+}
+
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:var(--surface);
   border:1px solid var(--border);
-  border-radius:10px;
-  margin-bottom:10px;
+  border-radius:16px;
+  padding:20px;
 }
 
-.profit{
-  color:var(--accent);
-  font-weight:700;
-}
-
-/* INPUT */
-.input{
-  display:flex;
-  margin-top:10px;
-}
-
-input{
-  flex:1;
-  padding:10px;
-  border:none;
-  background:#0f131a;
-  color:white;
+.price{
+  font-size:30px;
+  font-weight:800;
+  margin:10px 0;
 }
 
 button{
+  width:100%;
+  margin-top:12px;
   background:var(--accent);
   border:none;
-  padding:10px 14px;
+  padding:10px;
   font-weight:700;
   cursor:pointer;
 }
@@ -139,99 +182,145 @@ button{
 <body>
 
 <nav>
-  <div class="logo">Meridian Market</div>
+  <div class="logo">Meridian Market OS</div>
 </nav>
 
 <section class="hero">
-  <h1>AI Sales + Deal Intelligence<br>In One System</h1>
-  <p>Meridian Market automates customer conversations and surfaces high-margin opportunities in real time.</p>
+  <h1>The AI Commerce Platform<br>Built for Modern Sellers</h1>
+  <p>Create stores, manage products, and scale sales with AI-powered automation.</p>
 </section>
 
 <div class="grid">
 
-  <!-- CHAT ENGINE -->
+  <!-- STORE FRONT -->
   <div class="panel">
-    <h3>AI Sales Agent</h3>
+    <h3>Live Storefront Preview</h3>
 
-    <div class="chat-body" id="chat"></div>
+    <div class="products">
 
-    <div class="input">
-      <input id="msg" placeholder="Talk to Meridian AI..." />
-      <button onclick="send()">Send</button>
+      <div class="product">
+        <b>MacBook Air M1</b>
+        <div class="tag">$499 resale</div>
+      </div>
+
+      <div class="product">
+        <b>MacBook Pro 2019</b>
+        <div class="tag">$699 resale</div>
+      </div>
+
+      <div class="product">
+        <b>MacBook Air 2020</b>
+        <div class="tag">$549 resale</div>
+      </div>
+
+      <div class="product">
+        <b>iPad Air</b>
+        <div class="tag">$399 resale</div>
+      </div>
+
+      <div class="product">
+        <b>Gaming Laptop</b>
+        <div class="tag">$799 resale</div>
+      </div>
+
+      <div class="product">
+        <b>ThinkPad X1</b>
+        <div class="tag">$650 resale</div>
+      </div>
+
     </div>
   </div>
 
-  <!-- DEAL ENGINE -->
+  <!-- AI ASSISTANT -->
   <div class="panel">
-    <h3>Deal Intelligence Feed</h3>
-    <div id="deals"></div>
+    <h3>AI Merchant Assistant</h3>
+
+    <div class="chat" id="chat"></div>
+
+    <input id="msg" placeholder="Ask: pricing, products, scaling..." style="width:100%;padding:10px;margin-top:10px;background:#0f131a;border:none;color:white;">
+    <button onclick="send()">Ask AI</button>
   </div>
 
 </div>
 
+<!-- PRICING -->
+<section class="pricing">
+
+  <h2>Simple Pricing</h2>
+  <p>Everything you need to run a modern AI-powered store.</p>
+
+  <div class="pricing-grid">
+
+    <div class="card">
+      <h3>Starter Store</h3>
+      <div class="price">$9.99/mo</div>
+      <p style="color:var(--muted);font-size:13px;">Basic storefront + AI assistant</p>
+      <button onclick="checkout('starter')">Start</button>
+    </div>
+
+    <div class="card" style="border:1px solid var(--accent);">
+      <h3>Pro Commerce</h3>
+      <div class="price">$29/mo</div>
+      <p style="color:var(--muted);font-size:13px;">AI sales + product intelligence</p>
+      <button onclick="checkout('pro')">Upgrade</button>
+    </div>
+
+    <div class="card">
+      <h3>Elite OS</h3>
+      <div class="price">$79/mo</div>
+      <p style="color:var(--muted);font-size:13px;">Automation + scaling tools</p>
+      <button onclick="checkout('elite')">Go Elite</button>
+    </div>
+
+  </div>
+</section>
+
 <script>
 
 const chat = document.getElementById("chat");
-const deals = document.getElementById("deals");
 const msg = document.getElementById("msg");
 
-/* CHAT UI */
-function add(el,text,type){
+function add(text,type){
   const d=document.createElement("div");
   d.className="msg "+type;
   d.innerText=text;
-  el.appendChild(d);
+  chat.appendChild(d);
 }
 
-/* AI LOGIC */
 function ai(text){
   text = text.toLowerCase();
 
+  if(text.includes("store")){
+    return "You can generate a full storefront, manage products, and automate sales with Meridian OS.";
+  }
+
   if(text.includes("price")){
-    return "Meridian Market starts at $9.99/month with real-time deal alerts and AI sales automation.";
+    return "Plans start at $9.99/month for storefront tools and AI automation.";
   }
 
-  if(text.includes("demo") || text.includes("book")){
-    return "Great — I can set up a demo. What email should I use?";
-  }
-
-  return "Are you trying to increase sales conversion or discover high-margin opportunities?";
+  return "Do you want to build a store, increase sales, or automate product listings?";
 }
 
-/* SEND */
 function send(){
   const t = msg.value;
   if(!t) return;
 
-  add(chat,t,"user");
+  add(t,"user");
   msg.value="";
 
-  const reply = ai(t);
-  add(chat,reply,"ai");
+  add(ai(t),"ai");
 }
 
-/* DEAL ENGINE */
-function loadDeals(){
-  const sample=[
-    {title:"MacBook Air M1",profit:120},
-    {title:"MacBook Pro 2019",profit:90},
-    {title:"MacBook Air 2020",profit:150}
-  ];
+function checkout(plan){
 
-  deals.innerHTML="";
+  const links = {
+    starter: "https://buy.stripe.com/REPLACE_STARTER",
+    pro: "https://buy.stripe.com/REPLACE_PRO",
+    elite: "https://buy.stripe.com/REPLACE_ELITE"
+  };
 
-  sample.forEach(d=>{
-    const div=document.createElement("div");
-    div.className="deal";
-    div.innerHTML=`
-      <b>${d.title}</b><br>
-      <span class="profit">+$${d.profit} estimated margin</span>
-    `;
-    deals.appendChild(div);
-  });
+  window.location.href = links[plan];
 }
-
-loadDeals();
 
 </script>
 
