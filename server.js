@@ -2,12 +2,14 @@ import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import crypto from "crypto";
+import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 const app = express();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /* ─────────────────────────────
-   CORE MIDDLEWARE
+   MIDDLEWARE
 ───────────────────────────── */
 app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "1mb" }));
@@ -20,7 +22,7 @@ app.use(
 );
 
 /* ─────────────────────────────
-   DB (Supabase)
+   SUPABASE (DATABASE LAYER)
 ───────────────────────────── */
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -28,33 +30,33 @@ const supabase = createClient(
 );
 
 /* ─────────────────────────────
-   MULTI-TENANT CORE (SHOPIFY STYLE)
+   AUTH + STORE RESOLUTION (SHOPIFY CORE CONCEPT)
 ───────────────────────────── */
 
-/**
- * Each request belongs to a "store"
- */
 async function getStore(req) {
   const storeId = req.headers["x-store-id"];
-  if (!storeId) return null;
+  const apiKey = req.headers["x-api-key"];
+
+  if (!storeId || !apiKey) return null;
 
   const { data } = await supabase
     .from("stores")
     .select("*")
     .eq("id", storeId)
+    .eq("api_key", apiKey)
     .single();
 
   return data;
 }
 
 /* ─────────────────────────────
-   PRODUCTS API (Shopify Core)
+   PRODUCTS (REAL INVENTORY MODEL)
 ───────────────────────────── */
 
 // Create product
 app.post("/api/products", async (req, res) => {
   const store = await getStore(req);
-  if (!store) return res.status(401).json({ error: "Missing store" });
+  if (!store) return res.status(401).json({ error: "Unauthorized store" });
 
   const { name, price, stock, metadata } = req.body;
 
@@ -64,7 +66,8 @@ app.post("/api/products", async (req, res) => {
       store_id: store.id,
       name,
       price,
-      stock,
+      stock: stock ?? 0,
+      reserved_stock: 0,
       metadata: metadata || {}
     })
     .select()
@@ -78,7 +81,7 @@ app.post("/api/products", async (req, res) => {
 // List products
 app.get("/api/products", async (req, res) => {
   const store = await getStore(req);
-  if (!store) return res.status(401).json({ error: "Missing store" });
+  if (!store) return res.status(401).json({ error: "Unauthorized store" });
 
   const { data } = await supabase
     .from("products")
@@ -89,19 +92,26 @@ app.get("/api/products", async (req, res) => {
 });
 
 /* ─────────────────────────────
-   CART + CHECKOUT (REAL COMMERCE FLOW)
+   CHECKOUT SESSION (SHOPIFY-LIKE FLOW)
 ───────────────────────────── */
 
-// Create checkout session
 app.post("/api/checkout", async (req, res) => {
   const store = await getStore(req);
-  if (!store) return res.status(401).json({ error: "Missing store" });
+  if (!store) return res.status(401).json({ error: "Unauthorized store" });
 
   const { items } = req.body;
 
   const sessionId = crypto.randomUUID();
 
-  const { data } = await supabase
+  // reserve stock (important for real commerce systems)
+  for (const item of items) {
+    await supabase.rpc("reserve_stock", {
+      product_id: item.productId,
+      quantity: item.quantity
+    });
+  }
+
+  const session = await supabase
     .from("checkouts")
     .insert({
       id: sessionId,
@@ -113,18 +123,50 @@ app.post("/api/checkout", async (req, res) => {
     .single();
 
   res.json({
-    checkoutId: data.id,
-    url: `${process.env.FRONTEND_URL}/checkout/${data.id}`
+    checkoutId: session.data.id,
+    url: `${process.env.FRONTEND_URL}/checkout/${sessionId}`
   });
 });
 
 /* ─────────────────────────────
-   ORDERS (SHOPIFY CORE OBJECT)
+   STRIPE PAYMENT SESSION (REAL MONEY FLOW)
+───────────────────────────── */
+
+app.post("/api/payments/create-session", async (req, res) => {
+  const store = await getStore(req);
+  if (!store) return res.status(401).json({ error: "Unauthorized store" });
+
+  const { items } = req.body;
+
+  const line_items = items.map(i => ({
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: i.name
+      },
+      unit_amount: Math.round(i.price * 100)
+    },
+    quantity: i.quantity
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items,
+    success_url: `${process.env.FRONTEND_URL}/success`,
+    cancel_url: `${process.env.FRONTEND_URL}/cancel`
+  });
+
+  res.json({ url: session.url });
+});
+
+/* ─────────────────────────────
+   ORDERS (REAL COMMERCE OBJECT)
 ───────────────────────────── */
 
 app.post("/api/orders", async (req, res) => {
   const store = await getStore(req);
-  if (!store) return res.status(401).json({ error: "Missing store" });
+  if (!store) return res.status(401).json({ error: "Unauthorized store" });
 
   const { checkoutId } = req.body;
 
@@ -134,9 +176,7 @@ app.post("/api/orders", async (req, res) => {
     .eq("id", checkoutId)
     .single();
 
-  if (!checkout) {
-    return res.status(404).json({ error: "Checkout not found" });
-  }
+  if (!checkout) return res.status(404).json({ error: "Checkout not found" });
 
   const orderId = crypto.randomUUID();
 
@@ -160,7 +200,7 @@ app.post("/api/orders", async (req, res) => {
 });
 
 /* ─────────────────────────────
-   AI MERCHANT ENGINE (UPGRADED)
+   AI MERCHANT ENGINE
 ───────────────────────────── */
 
 app.post("/api/bot", async (req, res) => {
@@ -169,18 +209,18 @@ app.post("/api/bot", async (req, res) => {
   const id = sessionId || crypto.randomUUID();
   const text = message.toLowerCase();
 
-  let reply = "What would you like to build in your store?";
+  let reply = "What would you like to build?";
 
   if (text.includes("price")) {
-    reply = "Meridian Market starts at $9.99/month. You can create products, stores, and automate sales.";
+    reply = "Meridian Market starts at $9.99/month with AI commerce tools.";
   }
 
   if (text.includes("sell")) {
-    reply = "I can help you list products, set pricing, and optimize conversions.";
+    reply = "I can help you create products, set pricing, and increase conversions.";
   }
 
   if (text.includes("shopify")) {
-    reply = "Meridian Market is a next-gen commerce OS with AI automation and native checkout flows.";
+    reply = "This is a next-gen commerce OS with AI automation + native checkout.";
   }
 
   await supabase.from("conversations").insert({
@@ -189,22 +229,21 @@ app.post("/api/bot", async (req, res) => {
     reply
   });
 
-  res.json({
-    text: reply,
-    sessionId: id
-  });
+  res.json({ text: reply, sessionId: id });
 });
 
 /* ─────────────────────────────
-   BASIC WEBHOOK SYSTEM (EXTENSIBLE)
+   WEBHOOK EVENT PIPELINE
 ───────────────────────────── */
 
 app.post("/api/webhooks", async (req, res) => {
   const event = req.body;
 
   await supabase.from("events").insert({
+    id: crypto.randomUUID(),
     type: event.type || "generic",
-    payload: event
+    payload: event,
+    created_at: new Date().toISOString()
   });
 
   res.json({ ok: true });
@@ -215,5 +254,5 @@ app.post("/api/webhooks", async (req, res) => {
 ───────────────────────────── */
 
 app.listen(3000, () => {
-  console.log("🚀 Meridian Commerce OS running on :3000");
+  console.log("🚀 Meridian Commerce OS (Phase 2) running on port 3000");
 });
