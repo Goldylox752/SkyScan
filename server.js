@@ -4,23 +4,23 @@ import rateLimit from "express-rate-limit";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
-/* ─────────────────────────────
-   SERVER INIT
-───────────────────────────── */
 const app = express();
 
+/* ─────────────────────────────
+   CORE MIDDLEWARE
+───────────────────────────── */
 app.use(cors({ origin: "*" }));
 app.use(express.json({ limit: "1mb" }));
 
 app.use(
   rateLimit({
     windowMs: 60 * 1000,
-    max: 60
+    max: 120
   })
 );
 
 /* ─────────────────────────────
-   DB
+   DB (Supabase)
 ───────────────────────────── */
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -28,157 +28,192 @@ const supabase = createClient(
 );
 
 /* ─────────────────────────────
-   INTENTS (your AI logic)
+   MULTI-TENANT CORE (SHOPIFY STYLE)
 ───────────────────────────── */
-const intents = [
-  {
-    name: "buying",
-    keywords: ["buy", "price", "order"],
-    reply: "Best products available now.",
-    score: 0.95
-  }
-];
 
-/* ─────────────────────────────
-   INTENT ENGINE
-───────────────────────────── */
-function detectIntent(message = "") {
-  const text = message.toLowerCase();
+/**
+ * Each request belongs to a "store"
+ */
+async function getStore(req) {
+  const storeId = req.headers["x-store-id"];
+  if (!storeId) return null;
 
-  let best = null;
-  let bestScore = 0;
+  const { data } = await supabase
+    .from("stores")
+    .select("*")
+    .eq("id", storeId)
+    .single();
 
-  for (const intent of intents) {
-    const matches = intent.keywords.filter(k => text.includes(k)).length;
-
-    if (matches > 0) {
-      const score = matches * intent.score;
-
-      if (score > bestScore) {
-        bestScore = score;
-        best = intent;
-      }
-    }
-  }
-
-  return best;
+  return data;
 }
 
 /* ─────────────────────────────
-   BOT ENDPOINT (API)
+   PRODUCTS API (Shopify Core)
 ───────────────────────────── */
-app.post("/api/bot", async (req, res) => {
-  try {
-    const { message, sessionId } = req.body;
 
-    const id = sessionId || crypto.randomUUID();
+// Create product
+app.post("/api/products", async (req, res) => {
+  const store = await getStore(req);
+  if (!store) return res.status(401).json({ error: "Missing store" });
 
-    const intent = detectIntent(message);
+  const { name, price, stock, metadata } = req.body;
 
-    const reply = intent
-      ? intent.reply
-      : "Tell me what you're building.";
+  const { data, error } = await supabase
+    .from("products")
+    .insert({
+      store_id: store.id,
+      name,
+      price,
+      stock,
+      metadata: metadata || {}
+    })
+    .select()
+    .single();
 
-    /* store conversation */
-    await supabase.from("conversations").insert({
-      session_id: id,
-      message,
-      reply,
-      intent: intent?.name || "fallback"
-    });
+  if (error) return res.status(500).json({ error });
 
-    /* enqueue event */
-    await supabase.from("event_queue").insert({
-      type: "user_intent",
-      status: "pending",
-      attempts: 0,
-      run_after: new Date().toISOString(),
-      payload: { sessionId: id, message }
-    });
+  res.json(data);
+});
 
-    return res.json({
-      text: reply,
-      sessionId: id
-    });
+// List products
+app.get("/api/products", async (req, res) => {
+  const store = await getStore(req);
+  if (!store) return res.status(401).json({ error: "Missing store" });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "server error" });
-  }
+  const { data } = await supabase
+    .from("products")
+    .select("*")
+    .eq("store_id", store.id);
+
+  res.json(data);
 });
 
 /* ─────────────────────────────
-   WORKER (INSIDE SAME FILE)
+   CART + CHECKOUT (REAL COMMERCE FLOW)
 ───────────────────────────── */
 
-let running = false;
+// Create checkout session
+app.post("/api/checkout", async (req, res) => {
+  const store = await getStore(req);
+  if (!store) return res.status(401).json({ error: "Missing store" });
 
-/* claim jobs */
-async function claimJobs() {
+  const { items } = req.body;
+
+  const sessionId = crypto.randomUUID();
+
   const { data } = await supabase
-    .from("event_queue")
-    .update({ status: "processing" })
-    .eq("status", "pending")
-    .lte("run_after", new Date().toISOString())
+    .from("checkouts")
+    .insert({
+      id: sessionId,
+      store_id: store.id,
+      items,
+      status: "pending"
+    })
+    .select()
+    .single();
+
+  res.json({
+    checkoutId: data.id,
+    url: `${process.env.FRONTEND_URL}/checkout/${data.id}`
+  });
+});
+
+/* ─────────────────────────────
+   ORDERS (SHOPIFY CORE OBJECT)
+───────────────────────────── */
+
+app.post("/api/orders", async (req, res) => {
+  const store = await getStore(req);
+  if (!store) return res.status(401).json({ error: "Missing store" });
+
+  const { checkoutId } = req.body;
+
+  const { data: checkout } = await supabase
+    .from("checkouts")
     .select("*")
-    .limit(10);
+    .eq("id", checkoutId)
+    .single();
 
-  return data || [];
-}
-
-/* process job */
-async function handleJob(job) {
-  switch (job.type) {
-    case "user_intent":
-      await supabase.from("events").insert({
-        type: "processed",
-        payload: job.payload
-      });
-      return;
+  if (!checkout) {
+    return res.status(404).json({ error: "Checkout not found" });
   }
-}
 
-/* worker loop */
-async function processQueue() {
-  const jobs = await claimJobs();
+  const orderId = crypto.randomUUID();
 
-  for (const job of jobs) {
-    try {
-      await handleJob(job);
+  const { data } = await supabase
+    .from("orders")
+    .insert({
+      id: orderId,
+      store_id: store.id,
+      items: checkout.items,
+      status: "paid"
+    })
+    .select()
+    .single();
 
-      await supabase
-        .from("event_queue")
-        .update({ status: "completed" })
-        .eq("id", job.id);
+  await supabase
+    .from("checkouts")
+    .update({ status: "completed" })
+    .eq("id", checkoutId);
 
-    } catch (err) {
-      await supabase
-        .from("event_queue")
-        .update({
-          status: job.attempts > 5 ? "failed" : "pending",
-          attempts: (job.attempts || 0) + 1,
-          run_after: new Date(Date.now() + 30000)
-        })
-        .eq("id", job.id);
-    }
+  res.json(data);
+});
+
+/* ─────────────────────────────
+   AI MERCHANT ENGINE (UPGRADED)
+───────────────────────────── */
+
+app.post("/api/bot", async (req, res) => {
+  const { message, sessionId } = req.body;
+
+  const id = sessionId || crypto.randomUUID();
+  const text = message.toLowerCase();
+
+  let reply = "What would you like to build in your store?";
+
+  if (text.includes("price")) {
+    reply = "Meridian Market starts at $9.99/month. You can create products, stores, and automate sales.";
   }
-}
 
-/* interval worker */
-setInterval(async () => {
-  if (running) return;
-  running = true;
-
-  try {
-    await processQueue();
-  } finally {
-    running = false;
+  if (text.includes("sell")) {
+    reply = "I can help you list products, set pricing, and optimize conversions.";
   }
-}, 5000);
+
+  if (text.includes("shopify")) {
+    reply = "Meridian Market is a next-gen commerce OS with AI automation and native checkout flows.";
+  }
+
+  await supabase.from("conversations").insert({
+    session_id: id,
+    message,
+    reply
+  });
+
+  res.json({
+    text: reply,
+    sessionId: id
+  });
+});
+
+/* ─────────────────────────────
+   BASIC WEBHOOK SYSTEM (EXTENSIBLE)
+───────────────────────────── */
+
+app.post("/api/webhooks", async (req, res) => {
+  const event = req.body;
+
+  await supabase.from("events").insert({
+    type: event.type || "generic",
+    payload: event
+  });
+
+  res.json({ ok: true });
+});
 
 /* ─────────────────────────────
    START SERVER
 ───────────────────────────── */
+
 app.listen(3000, () => {
-  console.log("Server running on port 3000");
+  console.log("🚀 Meridian Commerce OS running on :3000");
 });
