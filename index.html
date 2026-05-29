@@ -3,196 +3,159 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Meridian Market — AI Product Intelligence</title>
+<title>Meridian Market — AI Chat Intelligence</title>
 
-<meta name="description" content="AI-powered ecommerce intelligence platform that discovers and scores winning products before they trend."/>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
 <style>
 :root{
   --bg:#0a0c0f;
   --surface:#141820;
-  --surface2:#1a2030;
-  --border:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.08);
   --text:#e8edf5;
-  --muted:#5a6478;
-  --muted2:#8a97ab;
+  --muted:#8a97ab;
   --accent:#00e5a0;
-  --blue:#4d9fff;
-  --red:#ff4d6a;
-  --amber:#ffb830;
-  --mono:'DM Mono', monospace;
-  --display:'Syne', sans-serif;
-  --serif:'Fraunces', serif;
 }
 
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+/* BASE */
 body{
-  font-family:var(--display);
+  margin:0;
+  font-family:Syne, sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
 /* NAV */
 nav{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:rgba(10,12,15,.9);
-  backdrop-filter:blur(20px);
+  padding:18px 24px;
   border-bottom:1px solid var(--border);
-}
-.nav{
-  max-width:1200px;
-  margin:auto;
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:18px 24px;
 }
-.logo{
-  font-weight:800;
-  letter-spacing:-.5px;
-}
-.logo span{color:var(--muted2);font-weight:400}
-.nav a{
-  color:var(--muted2);
-  text-decoration:none;
-  font-size:13px;
-  margin-left:18px;
-}
-.nav a:hover{color:var(--text)}
-.btn{
-  background:var(--accent);
-  color:#000;
-  padding:10px 16px;
-  border-radius:8px;
-  font-weight:700;
-  font-size:13px;
-  text-decoration:none;
-}
+.logo{font-weight:800}
+.logo span{color:var(--muted)}
 
 /* HERO */
 .hero{
-  max-width:1200px;
-  margin:auto;
-  padding:90px 24px;
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:60px;
+  padding:80px 24px;
+  max-width:900px;
 }
 .hero h1{
-  font-family:var(--serif);
-  font-size:64px;
+  font-size:56px;
   line-height:1;
 }
-.hero h1 em{color:var(--muted2);font-weight:300}
 .hero p{
-  margin-top:20px;
-  color:var(--muted2);
-  line-height:1.7;
-}
-.hero-actions{
-  margin-top:30px;
-  display:flex;
-  gap:12px;
+  color:var(--muted);
+  margin-top:14px;
 }
 
-/* PANEL */
-.panel{
+/* CHAT FLOAT BUTTON */
+.chat-bubble{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:800;
+  color:#000;
+  box-shadow:0 10px 30px rgba(0,229,160,.3);
+  z-index:9999;
+}
+
+/* CHAT WINDOW */
+.chat-window{
+  position:fixed;
+  bottom:100px;
+  right:24px;
+  width:360px;
+  height:520px;
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:16px;
-  padding:20px;
-}
-.metric{
-  display:flex;
-  justify-content:space-between;
-  padding:14px 0;
-  border-bottom:1px solid var(--border);
-}
-.metric:last-child{border:none}
-.metric b{color:var(--accent)}
-
-/* SECTIONS */
-.section{
-  max-width:1200px;
-  margin:auto;
-  padding:80px 24px;
-  border-top:1px solid var(--border);
-}
-.section h2{
-  font-family:var(--serif);
-  font-size:42px;
-}
-
-/* PRODUCTS */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  margin-top:40px;
-}
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:14px;
+  display:none;
+  flex-direction:column;
   overflow:hidden;
-}
-.card img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-}
-.card-body{
-  padding:18px;
-}
-.price{
-  font-size:26px;
-  font-weight:800;
-  margin-top:10px;
-  color:var(--accent);
-}
-.tag{
-  font-size:10px;
-  font-family:var(--mono);
-  color:var(--muted2);
-  margin-top:10px;
+  z-index:9999;
 }
 
-/* CTA */
-.cta{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:60px;
-  margin:80px 24px;
-  text-align:center;
-}
-.cta h2{
-  font-size:40px;
-  font-family:var(--serif);
-}
-
-/* FOOTER */
-footer{
-  max-width:1200px;
-  margin:auto;
-  padding:40px 24px;
+.chat-header{
+  padding:14px;
+  border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
-  border-top:1px solid var(--border);
-  color:var(--muted);
-  font-size:12px;
+  align-items:center;
 }
 
-/* RESPONSIVE */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr}
-  .grid{grid-template-columns:1fr}
+.chat-title{
+  font-weight:700;
+}
+
+.chat-close{
+  cursor:pointer;
+  color:var(--muted);
+}
+
+/* MESSAGES */
+.chat-body{
+  flex:1;
+  padding:14px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.msg{
+  max-width:80%;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.user{
+  background:#1f2937;
+  align-self:flex-end;
+}
+
+.ai{
+  background:rgba(0,229,160,.1);
+  border:1px solid rgba(0,229,160,.2);
+  align-self:flex-start;
+}
+
+/* INPUT */
+.chat-input{
+  display:flex;
+  border-top:1px solid var(--border);
+}
+
+.chat-input input{
+  flex:1;
+  padding:12px;
+  border:none;
+  outline:none;
+  background:#0f131a;
+  color:var(--text);
+}
+
+.chat-input button{
+  background:var(--accent);
+  border:none;
+  padding:0 16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* ANIMATION */
+.chat-window.open{
+  display:flex;
 }
 </style>
 </head>
@@ -200,87 +163,83 @@ footer{
 <body>
 
 <nav>
-  <div class="nav">
-    <div class="logo">Meridian<span>Market</span></div>
-    <div>
-      <a href="#products">Products</a>
-      <a href="#engine">Engine</a>
-      <a href="#cta">Demo</a>
-      <a class="btn" href="#cta">Book Call</a>
-    </div>
-  </div>
+  <div class="logo">Meridian <span>AI Chat</span></div>
 </nav>
 
 <section class="hero">
-  <div>
-    <h1>Find Winning<br><em>Products</em> Before They Trend</h1>
-    <p>
-      AI-powered product intelligence that detects demand spikes,
-      scores products, and helps you launch before saturation.
-    </p>
-    <div class="hero-actions">
-      <a class="btn" href="#products">Explore</a>
-      <a class="btn" href="#cta" style="background:#fff;color:#000">Strategy Call</a>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="metric"><span>Products Scanned</span><b>1,284</b></div>
-    <div class="metric"><span>Accuracy</span><b>91%</b></div>
-    <div class="metric"><span>Active Brands</span><b>84</b></div>
-    <div class="metric"><span>Revenue Tracked</span><b>$42K</b></div>
-  </div>
-</section>
-
-<section class="section" id="products">
-  <h2>Winning Products</h2>
-
-  <div class="grid">
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200" />
-      <div class="card-body">
-        <h3>Velocity Running System</h3>
-        <div class="price">$129</div>
-        <div class="tag">Score: 94 • ROAS 4.8x</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200" />
-      <div class="card-body">
-        <h3>Chronos Smart Watch</h3>
-        <div class="price">$179</div>
-        <div class="tag">Score: 97 • ROAS 6.2x</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200" />
-      <div class="card-body">
-        <h3>Meridian Streetwear</h3>
-        <div class="price">$89</div>
-        <div class="tag">Score: 91 • ROAS 5.1x</div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="cta" id="cta">
-  <h2>Start Finding Winning Products Today</h2>
-  <p style="color:var(--muted2);margin-top:12px">
-    Book a free strategy call and launch faster with AI validation.
+  <h1>Turn Visitors Into<br>Customers With AI Chat</h1>
+  <p>
+    Replace Intercom with a fully autonomous AI sales + support agent
+    that qualifies leads and books calls in real time.
   </p>
-  <div style="margin-top:20px">
-    <a class="btn" href="#">Book Call</a>
-  </div>
 </section>
 
-<footer>
-  <div>© 2026 Meridian Market</div>
-  <div>Privacy • Terms • API</div>
-</footer>
+<!-- CHAT UI -->
+<div class="chat-bubble" onclick="toggleChat()">AI</div>
+
+<div class="chat-window" id="chatWindow">
+
+  <div class="chat-header">
+    <div class="chat-title">Meridian AI</div>
+    <div class="chat-close" onclick="toggleChat()">✕</div>
+  </div>
+
+  <div class="chat-body" id="chatBody">
+    <div class="msg ai">Hey 👋 I’m your AI assistant. Ask me anything about Meridian.</div>
+  </div>
+
+  <div class="chat-input">
+    <input id="input" placeholder="Type a message..." />
+    <button onclick="sendMsg()">Send</button>
+  </div>
+
+</div>
+
+<script>
+const chatWindow = document.getElementById("chatWindow");
+const chatBody = document.getElementById("chatBody");
+const input = document.getElementById("input");
+
+function toggleChat(){
+  chatWindow.classList.toggle("open");
+}
+
+function addMsg(text, type){
+  const div = document.createElement("div");
+  div.className = `msg ${type}`;
+  div.innerText = text;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+async function sendMsg(){
+  const text = input.value;
+  if(!text) return;
+
+  addMsg(text, "user");
+  input.value = "";
+
+  // placeholder AI response (replace with backend)
+  addMsg("Typing...", "ai");
+
+  const res = await fetch("/api/chat", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ message: text })
+  }).catch(()=>null);
+
+  // remove "Typing..."
+  chatBody.lastChild.remove();
+
+  if(!res){
+    addMsg("AI offline. Connect backend at /api/chat", "ai");
+    return;
+  }
+
+  const data = await res.json();
+  addMsg(data.reply || "No response", "ai");
+}
+</script>
 
 </body>
 </html>
