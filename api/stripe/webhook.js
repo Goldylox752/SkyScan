@@ -1,4 +1,4 @@
-router.post(
+app.post(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
   async (req, res) => {
@@ -11,21 +11,59 @@ router.post(
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      console.error("❌ Signature failed:", err.message);
       return res.status(400).send("Invalid signature");
     }
 
-    try {
-      // ONLY QUEUE EVENT — NO BUSINESS LOGIC
-      await supabase.from("event_queue").insert({
-        type: event.type,
-        payload: event
+    /* ─────────────────────────────
+       PAYMENT SUCCESS
+    ───────────────────────────── */
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      const checkoutId = session.metadata.checkoutId;
+
+      const { data: checkout } = await supabase
+        .from("checkouts")
+        .select("*")
+        .eq("id", checkoutId)
+        .single();
+
+      if (!checkout) return res.json({ received: true });
+
+      /* ─────────────────────────────
+         CREATE ORDER (SHOPIFY CORE OBJECT)
+      ───────────────────────────── */
+      const orderId = crypto.randomUUID();
+
+      await supabase.from("orders").insert({
+        id: orderId,
+        checkout_id: checkoutId,
+        items: checkout.items,
+        status: "paid",
+        stripe_session: session.id,
+        total: session.amount_total / 100,
       });
 
-      return res.status(200).json({ received: true });
-    } catch (err) {
-      console.error("❌ Queue insert failed:", err);
-      return res.status(500).json({ error: "Queue failure" });
+      /* ─────────────────────────────
+         UPDATE CHECKOUT
+      ───────────────────────────── */
+      await supabase
+        .from("checkouts")
+        .update({ status: "completed" })
+        .eq("id", checkoutId);
+
+      /* ─────────────────────────────
+         EVENT SYSTEM (YOUR ENGINE)
+      ───────────────────────────── */
+      await supabase.from("events").insert({
+        type: "order_paid",
+        payload: {
+          orderId,
+          checkoutId,
+        },
+      });
     }
+
+    return res.json({ received: true });
   }
 );
