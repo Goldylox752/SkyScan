@@ -2,13 +2,17 @@ app.post("/create-checkout", async (req, res) => {
   try {
     const { sku } = req.body;
 
-    const { data: product } = await supabase
+    if (!sku) {
+      return res.status(400).json({ error: "Missing SKU" });
+    }
+
+    const { data: product, error } = await supabase
       .from("products")
       .select("*")
       .eq("sku", sku)
       .single();
 
-    if (!product) {
+    if (error || !product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
@@ -42,10 +46,10 @@ app.post("/create-checkout", async (req, res) => {
       cancel_url: `${process.env.FRONTEND_URL}/cancel`
     });
 
-    return res.json({ url: session.url });
+    return res.json({ url: session.url, id: session.id });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Checkout failed" });
+    console.error("Checkout failed:", err);
+    return res.status(500).json({ error: "Checkout failed" });
   }
 });
