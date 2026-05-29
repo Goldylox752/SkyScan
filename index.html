@@ -1,1308 +1,1495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
-/>
-
-<title>
-Meridian Market — AI Product Intelligence
-</title>
-
-<meta
-  name="description"
-  content="AI-powered ecommerce intelligence platform that discovers and scores winning products before they trend."
-/>
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meridian Market — AI Product Intelligence</title>
+<meta name="description" content="AI-powered ecommerce intelligence platform that discovers and scores winning products before they trend."/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-  rel="stylesheet"
-/>
-
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet"/>
 <style>
 
-:root{
-
-  --bg:#edf3f8;
-  --bg2:#dbe7f2;
-
-  --text:#172230;
-  --muted:#66768a;
-
-  --white:#ffffff;
-
-  --blue:#5edcff;
-  --blue2:#2ca9ff;
-
-  --glass:rgba(255,255,255,.48);
-
-  --border:rgba(255,255,255,.72);
-
-  --shadow:
-    0 10px 30px rgba(0,0,0,.08),
-    0 2px 10px rgba(0,0,0,.04);
-
+:root {
+  --bg: #0a0c0f;
+  --bg2: #0f1217;
+  --surface: #141820;
+  --surface2: #1a2030;
+  --border: rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.12);
+  --text: #e8edf5;
+  --muted: #5a6478;
+  --muted2: #8a97ab;
+  --accent: #00e5a0;
+  --accent2: #00b87a;
+  --blue: #4d9fff;
+  --red: #ff4d6a;
+  --amber: #ffb830;
+  --mono: 'DM Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --serif: 'Fraunces', serif;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--display);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
 }
 
-html{
-  scroll-behavior:smooth;
+/* CUSTOM CURSOR */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transition: transform .15s ease, opacity .2s;
+  mix-blend-mode: difference;
+}
+.cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,229,160,.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transition: transform .35s cubic-bezier(.23,1,.32,1), width .3s, height .3s;
+  transform: translate(-50%, -50%);
 }
 
-body{
-
-  font-family:Inter,sans-serif;
-
-  background:
-    radial-gradient(
-      circle at top left,
-      #ffffff 0%,
-      #edf4fa 25%,
-      #dce6f0 70%,
-      #d0dae5 100%
-    );
-
-  color:var(--text);
-
-  overflow-x:hidden;
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+  opacity: .6;
 }
 
-/* BACKGROUND */
-
-.bg{
-  position:fixed;
-  border-radius:999px;
-  filter:blur(100px);
-  z-index:-1;
-  opacity:.6;
-}
-
-.bg1{
-  width:320px;
-  height:320px;
-  background:#a9edff;
-  top:-100px;
-  left:-80px;
-}
-
-.bg2{
-  width:420px;
-  height:420px;
-  background:#ffffff;
-  right:-120px;
-  top:60px;
-}
-
-.bg3{
-  width:300px;
-  height:300px;
-  background:#b5e9ff;
-  bottom:-100px;
-  left:40%;
+/* SCANLINE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+  pointer-events: none;
+  z-index: 9997;
 }
 
 /* NAV */
-
-nav{
-
-  position:sticky;
-  top:0;
-  z-index:999;
-
-  backdrop-filter:blur(24px);
-
-  background:rgba(255,255,255,.38);
-
-  border-bottom:1px solid rgba(255,255,255,.55);
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,12,15,.88);
+  backdrop-filter: blur(20px);
 }
-
-.nav-inner{
-
-  max-width:1380px;
-  margin:auto;
-
-  padding:18px 28px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.nav-inner {
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-.logo{
-
-  font-size:22px;
-  font-weight:800;
-  letter-spacing:-1px;
+.logo {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
-.logo span{
-
-  background:
-    linear-gradient(
-      135deg,
-      #59d5ff,
-      #7cecff
-    );
-
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.nav-links{
-
-  display:flex;
-  align-items:center;
-  gap:18px;
+.logo-mark svg { width: 14px; height: 14px; }
+.logo span { color: var(--muted2); font-weight: 400; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
-
-.nav-links a{
-
-  text-decoration:none;
-  color:var(--muted);
-
-  font-size:14px;
-  font-weight:600;
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted2);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  transition: color .2s;
 }
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,229,160,.4); }
+  50% { opacity: .8; box-shadow: 0 0 0 6px rgba(0,229,160,0); }
+}
+.btn-nav {
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: none;
+  text-decoration: none;
+  transition: background .2s, transform .15s;
+}
+.btn-nav:hover { background: #00ffb2; transform: translateY(-1px); }
 
-.launch-btn{
-
-  padding:12px 18px;
-  border-radius:14px;
-
-  color:#122434 !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.95),
-      rgba(161,240,255,.72)
-    );
-
-  border:1px solid rgba(255,255,255,.82);
-
-  box-shadow:
-    0 8px 24px rgba(88,215,255,.16);
+/* TICKER */
+.ticker-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+.ticker {
+  display: flex;
+  gap: 60px;
+  animation: ticker 28s linear infinite;
+  white-space: nowrap;
+}
+.ticker span {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ticker span b { color: var(--accent); font-weight: 500; }
+.ticker span.up b { color: var(--accent); }
+.ticker span.down b { color: var(--red); }
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* HERO */
-
-.hero{
-
-  max-width:1380px;
-  margin:auto;
-
-  padding:
-    110px
-    28px
-    70px;
-
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:48px;
-  align-items:center;
+.hero {
+  max-width: 1440px;
+  margin: auto;
+  padding: 100px 40px 80px;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 60px;
+  align-items: start;
+  position: relative;
 }
 
-.hero h1{
-
-  font-size:82px;
-  line-height:.94;
-  letter-spacing:-4px;
-  font-weight:800;
+/* Grid lines background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  pointer-events: none;
 }
 
-.hero h1 span{
-
-  background:
-    linear-gradient(
-      135deg,
-      #72e6ff,
-      #2ca9ff
-    );
-
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  padding: 6px 12px;
+  border: 1px solid rgba(0,229,160,.2);
+  border-radius: 4px;
+  background: rgba(0,229,160,.04);
 }
 
-.hero p{
-
-  margin-top:26px;
-
-  max-width:720px;
-
-  color:var(--muted);
-
-  font-size:18px;
-  line-height:1.8;
+.hero h1 {
+  font-family: var(--serif);
+  font-size: 78px;
+  line-height: .96;
+  letter-spacing: -3px;
+  font-weight: 700;
+}
+.hero h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--muted2);
+}
+.hero h1 .hl {
+  position: relative;
+  display: inline-block;
+}
+.hero h1 .hl::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
-.hero-actions{
-
-  margin-top:34px;
-
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
+.hero-sub {
+  margin-top: 32px;
+  color: var(--muted2);
+  font-size: 17px;
+  line-height: 1.75;
+  font-family: var(--display);
+  font-weight: 400;
+  max-width: 560px;
 }
 
-.btn{
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:15px 22px;
-
-  border-radius:18px;
-
-  text-decoration:none;
-
-  font-weight:700;
-
-  transition:.22s;
+.hero-actions {
+  margin-top: 44px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
-.primary{
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #b5edff
-    );
-
-  color:#132534;
-
-  border:1px solid rgba(255,255,255,.88);
-
-  box-shadow:
-    0 12px 28px rgba(88,215,255,.18);
+.btn-primary {
+  padding: 14px 28px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .2s, transform .15s, box-shadow .2s;
+}
+.btn-primary:hover {
+  background: #00ffb2;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,229,160,.25);
 }
 
-.secondary{
-
-  background:rgba(255,255,255,.3);
-
-  border:1px solid rgba(255,255,255,.65);
-
-  backdrop-filter:blur(20px);
-
-  color:#223344;
+.btn-ghost {
+  padding: 14px 24px;
+  background: transparent;
+  color: var(--muted2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all .2s;
+}
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: rgba(255,255,255,.2);
+  background: var(--surface);
 }
 
-.btn:hover{
-  transform:translateY(-2px);
+.trust-row {
+  margin-top: 48px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+.trust-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.trust-item::before {
+  content: '//';
+  color: var(--accent);
+  opacity: .6;
 }
 
-/* TRUST BAR */
-
-.trust-bar{
-
-  margin-top:38px;
-
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
+/* HERO PANEL */
+.hero-panel {
+  position: relative;
 }
 
-.trust{
-
-  padding:12px 16px;
-
-  border-radius:999px;
-
-  background:rgba(255,255,255,.4);
-
-  border:1px solid rgba(255,255,255,.65);
-
-  font-size:12px;
-  font-weight:700;
-
-  color:#4c6074;
+.intel-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-/* PANEL */
-
-.panel{
-
-  position:relative;
-
-  padding:28px;
-
-  border-radius:34px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.58),
-      rgba(255,255,255,.22)
-    );
-
-  border:1px solid rgba(255,255,255,.75);
-
-  backdrop-filter:blur(28px);
-
-  box-shadow:
-    var(--shadow),
-    0 0 40px rgba(88,215,255,.18);
-
-  overflow:hidden;
+.intel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.panel-top{
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.intel-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
 }
 
-.panel-title{
-
-  font-size:18px;
-  font-weight:700;
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: .08em;
 }
 
-.live{
-
-  font-size:12px;
-  font-weight:700;
-
-  color:#2ca9ff;
+.intel-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
 }
 
-.metrics{
-
-  margin-top:24px;
-
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
+.intel-metric {
+  padding: 24px 20px;
+  position: relative;
 }
 
-.metric{
-
-  padding:20px;
-
-  border-radius:24px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.42),
-      rgba(255,255,255,.18)
-    );
-
-  border:1px solid rgba(255,255,255,.62);
-
-  backdrop-filter:blur(16px);
+.intel-metric:nth-child(odd) {
+  border-right: 1px solid var(--border);
 }
 
-.metric-value{
-
-  font-size:34px;
-  font-weight:800;
+.intel-metric:nth-child(1),
+.intel-metric:nth-child(2) {
+  border-bottom: 1px solid var(--border);
 }
 
-.metric-label{
+.m-val {
+  font-family: var(--display);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+}
 
-  margin-top:6px;
+.m-val.green { color: var(--accent); }
+.m-val.blue { color: var(--blue); }
+.m-val.amber { color: var(--amber); }
 
-  color:var(--muted);
+.m-label {
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
 
-  font-size:12px;
+.m-change {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+.m-change.up { color: var(--accent); background: rgba(0,229,160,.1); }
+.m-change.dn { color: var(--red); background: rgba(255,77,106,.1); }
+
+/* MINI CHART */
+.chart-row {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.chart-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+}
+.sparkline {
+  height: 50px;
+  width: 100%;
+  position: relative;
+}
+.sparkline svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* TOP SIGNALS */
+.signals-row {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.signal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.signal-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.signal-name { color: var(--text); flex: 1; }
+.signal-score {
+  color: var(--accent);
+  font-weight: 500;
+}
+.signal-bar-wrap {
+  width: 80px;
+  height: 3px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.signal-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 1s ease;
 }
 
 /* SECTION */
-
-.section{
-
-  max-width:1380px;
-  margin:auto;
-
-  padding:
-    30px
-    28px
-    90px;
+.section {
+  max-width: 1440px;
+  margin: auto;
+  padding: 100px 40px;
+  border-top: 1px solid var(--border);
 }
 
-.section-header{
-
-  margin-bottom:36px;
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
 }
 
-.section-header h2{
+.section h2 {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  max-width: 700px;
+}
+.section h2 em { font-style: italic; font-weight: 300; color: var(--muted2); }
 
-  font-size:44px;
-  letter-spacing:-2px;
+.section-sub {
+  margin-top: 16px;
+  color: var(--muted2);
+  font-size: 16px;
+  line-height: 1.75;
+  max-width: 600px;
 }
 
-.section-header p{
-
-  margin-top:14px;
-
-  max-width:760px;
-
-  color:var(--muted);
-
-  line-height:1.8;
+/* HOW IT WORKS */
+.steps-grid {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
 }
-
-/* STEPS */
-
-.steps{
-
-  display:grid;
-  grid-template-columns:
-    repeat(auto-fit,minmax(280px,1fr));
-
-  gap:24px;
+.step {
+  background: var(--surface);
+  padding: 40px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: background .25s;
 }
-
-.step{
-
-  padding:32px;
-
-  border-radius:30px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.52),
-      rgba(255,255,255,.22)
-    );
-
-  border:1px solid rgba(255,255,255,.7);
-
-  backdrop-filter:blur(22px);
-
-  box-shadow:var(--shadow);
+.step:hover { background: var(--surface2); }
+.step::before {
+  content: attr(data-n);
+  position: absolute;
+  top: -20px; right: -10px;
+  font-family: var(--serif);
+  font-size: 120px;
+  font-weight: 700;
+  color: rgba(255,255,255,.03);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
-
-.step-number{
-
-  font-size:13px;
-  font-weight:800;
-
-  color:#2ca9ff;
-
-  margin-bottom:14px;
+.step-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .1em;
+  margin-bottom: 24px;
 }
-
-.step h3{
-
-  font-size:24px;
-
-  margin-bottom:14px;
+.step h3 {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  margin-bottom: 14px;
 }
-
-.step p{
-
-  color:var(--muted);
-
-  line-height:1.8;
+.step p {
+  color: var(--muted2);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.step-icon {
+  width: 44px; height: 44px;
+  background: rgba(0,229,160,.08);
+  border: 1px solid rgba(0,229,160,.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 /* PRODUCTS */
-
-.grid{
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(auto-fit,minmax(320px,1fr));
-
-  gap:24px;
+.products-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.filter-tab {
+  padding: 7px 16px;
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  cursor: none;
+  transition: all .2s;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.filter-tab.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 500;
 }
 
-.card{
-
-  overflow:hidden;
-
-  border-radius:32px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.55),
-      rgba(255,255,255,.2)
-    );
-
-  border:1px solid rgba(255,255,255,.72);
-
-  backdrop-filter:blur(24px);
-
-  box-shadow:var(--shadow);
-
-  transition:.28s;
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
-.card:hover{
-
-  transform:translateY(-8px);
-
-  box-shadow:
-    0 18px 40px rgba(88,215,255,.18),
-    0 10px 24px rgba(0,0,0,.08);
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .28s, border-color .28s, box-shadow .28s;
+  position: relative;
+  group: true;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0,229,160,.3);
+  box-shadow: 0 20px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(0,229,160,.1);
 }
 
-.card img{
-
-  width:100%;
-  height:280px;
-  object-fit:cover;
+.card-img-wrap {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+}
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.85) saturate(.9);
+  transition: transform .5s ease, filter .3s;
+}
+.product-card:hover .card-img-wrap img {
+  transform: scale(1.05);
+  filter: brightness(.9) saturate(1);
 }
 
-.content{
-  padding:24px;
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,12,15,.95) 0%, transparent 60%);
 }
 
-.badge{
+.card-badges {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 6px;
+}
+.badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.badge-verified { background: rgba(0,229,160,.15); color: var(--accent); border: 1px solid rgba(0,229,160,.3); }
+.badge-winner { background: rgba(255,184,48,.15); color: var(--amber); border: 1px solid rgba(255,184,48,.3); }
+.badge-hot { background: rgba(255,77,106,.15); color: var(--red); border: 1px solid rgba(255,77,106,.3); }
 
-  display:inline-flex;
-
-  padding:10px 14px;
-
-  border-radius:999px;
-
-  background:rgba(255,255,255,.5);
-
-  border:1px solid rgba(255,255,255,.72);
-
-  font-size:11px;
-  font-weight:700;
-
-  color:#178fb2;
+.card-score-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 48px; height: 48px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.score-num {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.score-sub {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-top: 2px;
 }
 
-.title{
-
-  margin-top:18px;
-
-  font-size:20px;
-  font-weight:700;
+.card-body {
+  padding: 24px;
 }
 
-.desc{
-
-  margin-top:12px;
-
-  color:var(--muted);
-
-  line-height:1.7;
-
-  font-size:14px;
+.card-title {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  margin-bottom: 8px;
 }
 
-.meta{
-
-  margin-top:24px;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.card-desc {
+  color: var(--muted2);
+  font-size: 13px;
+  line-height: 1.65;
+  margin-bottom: 20px;
 }
 
-.price{
-
-  font-size:30px;
-  font-weight:800;
-
-  color:#00a977;
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
 }
 
-.score{
-
-  text-align:right;
+.card-price {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
 }
 
-.score-label{
-
-  font-size:11px;
-  color:var(--muted);
+.roas {
+  text-align: right;
+}
+.roas-val {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.roas-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-top: 2px;
 }
 
-.score-value{
-
-  margin-top:3px;
-
-  font-size:18px;
-  font-weight:700;
-
-  color:#2ca9ff;
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.tag {
+  padding: 5px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: .04em;
 }
 
-.tags{
-
-  margin-top:20px;
-
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
+.card-velocity {
+  margin-bottom: 20px;
+}
+.vel-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+.vel-val { color: var(--accent); }
+.vel-bar-track {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.vel-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 2px;
 }
 
-.tag{
+.btn-buy {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: none;
+  transition: all .22s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: .02em;
+}
+.btn-buy:hover {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+.btn-buy svg { transition: transform .2s; }
+.btn-buy:hover svg { transform: translateX(3px); }
 
-  padding:8px 12px;
-
-  border-radius:999px;
-
-  background:rgba(255,255,255,.38);
-
-  border:1px solid rgba(255,255,255,.65);
-
-  font-size:11px;
-  font-weight:700;
-
-  color:#516273;
+/* CTA SECTION */
+.cta-section {
+  margin: 0 40px 80px;
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  background: var(--surface);
+}
+.cta-inner {
+  padding: 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.cta-section::after {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,229,160,.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-.buy{
-
-  width:100%;
-
-  margin-top:22px;
-
-  padding:15px;
-
-  border:none;
-  cursor:pointer;
-
-  border-radius:18px;
-
-  font-weight:800;
-  font-size:14px;
-
-  color:#102433;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #9cecff
-    );
-
-  border:1px solid rgba(255,255,255,.9);
-
-  box-shadow:
-    0 10px 24px rgba(88,215,255,.18);
+.cta-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 20px;
 }
 
-/* CTA */
+.cta-section h2 {
+  font-family: var(--serif);
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.05;
+}
+.cta-section h2 em { font-style: italic; font-weight: 300; color: var(--muted2); }
 
-.cta{
-
-  max-width:1180px;
-
-  margin:80px auto;
-
-  padding:60px;
-
-  text-align:center;
-
-  border-radius:40px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.58),
-      rgba(255,255,255,.24)
-    );
-
-  border:1px solid rgba(255,255,255,.72);
-
-  backdrop-filter:blur(26px);
-
-  box-shadow:
-    0 20px 60px rgba(88,215,255,.16);
+.cta-sub {
+  margin-top: 16px;
+  color: var(--muted2);
+  font-size: 16px;
+  line-height: 1.7;
 }
 
-.cta h2{
-
-  font-size:52px;
-  line-height:1;
-  letter-spacing:-2px;
+.cta-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.cta p{
+.cta-stat {
+  padding: 24px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.cta-stat-val {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.cta-stat-info {}
+.cta-stat-label {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cta-stat-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
 
-  margin-top:20px;
-
-  color:var(--muted);
-
-  max-width:720px;
-
-  margin-inline:auto;
-
-  line-height:1.8;
+.cta-actions {
+  margin-top: 36px;
+  display: flex;
+  gap: 12px;
 }
 
 /* FOOTER */
-
-footer{
-
-  padding:50px 24px;
-
-  text-align:center;
-
-  color:var(--muted);
-
-  border-top:1px solid rgba(255,255,255,.5);
-
-  background:rgba(255,255,255,.2);
-
-  backdrop-filter:blur(18px);
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px;
+  max-width: 1440px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-/* FLOATING CTA */
-
-.floating{
-
-  position:fixed;
-
-  right:24px;
-  bottom:24px;
-
-  z-index:9999;
-
-  padding:16px 22px;
-
-  border-radius:18px;
-
-  text-decoration:none;
-
-  font-weight:800;
-
-  color:#102433;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #8cecff
-    );
-
-  box-shadow:
-    0 14px 40px rgba(88,215,255,.28);
+.footer-copy {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
 }
-
-/* MOBILE */
-
-@media(max-width:980px){
-
-  .hero{
-    grid-template-columns:1fr;
-  }
-
-  .hero h1{
-    font-size:58px;
-  }
+.footer-links {
+  display: flex;
+  gap: 24px;
 }
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  transition: color .2s;
+}
+.footer-links a:hover { color: var(--text); }
 
-@media(max-width:640px){
+/* FLOATING */
+.floating-cta {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0,229,160,.3);
+  transition: background .2s, transform .2s;
+  cursor: none;
+}
+.floating-cta:hover { background: #00ffb2; transform: translateY(-2px); }
 
-  .hero h1{
-    font-size:44px;
-    letter-spacing:-2px;
-  }
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp .7s cubic-bezier(.23,1,.32,1) both;
+}
+.fade-up:nth-child(2) { animation-delay: .1s; }
+.fade-up:nth-child(3) { animation-delay: .2s; }
 
-  .section-header h2{
-    font-size:34px;
-  }
-
-  .cta h2{
-    font-size:38px;
-  }
-
-  .metrics{
-    grid-template-columns:1fr;
-  }
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-panel { display: none; }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .steps-grid { grid-template-columns: 1fr; }
+  .cta-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 52px; }
+  .products-grid { grid-template-columns: 1fr; }
+  nav .nav-links { display: none; }
+  footer { flex-direction: column; gap: 20px; text-align: center; }
 }
 
 </style>
 </head>
-
 <body>
 
-<div class="bg bg1"></div>
-<div class="bg bg2"></div>
-<div class="bg bg3"></div>
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
+<!-- NAV -->
 <nav>
-
   <div class="nav-inner">
-
     <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 14 14" fill="none">
+          <rect x="1" y="1" width="5" height="5" fill="#000" rx="1"/>
+          <rect x="8" y="1" width="5" height="5" fill="#000" rx="1" opacity=".5"/>
+          <rect x="1" y="8" width="5" height="5" fill="#000" rx="1" opacity=".5"/>
+          <rect x="8" y="8" width="5" height="5" fill="#000" rx="1"/>
+        </svg>
+      </div>
       Meridian<span>Market</span>
     </div>
-
     <div class="nav-links">
-
-      <a href="#products">
-        Products
-      </a>
-
-      <a href="#engine">
-        AI Engine
-      </a>
-
-      <a href="#audit">
-        Audit
-      </a>
-
-      <a href="#" class="launch-btn">
-        Book Demo
-      </a>
-
+      <a href="#products">Products</a>
+      <a href="#engine">AI Engine</a>
+      <a href="#audit">Audit</a>
     </div>
-
+    <div class="nav-cta">
+      <div class="status-dot"></div>
+      <a href="#audit" class="btn-nav">Book Demo</a>
+    </div>
   </div>
-
 </nav>
 
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="up">VELOCITY RUNNING <b>↑ +212%</b></span>
+    <span>AI SCORE AVG <b>93.4</b></span>
+    <span class="up">CHRONOS WATCH <b>↑ HIGH DEMAND</b></span>
+    <span>PRODUCTS SCANNED <b>1,284</b></span>
+    <span class="up">STREETWEAR <b>↑ TIKTOK SURGE</b></span>
+    <span>PREDICTION ACCURACY <b>91%</b></span>
+    <span class="up">REVENUE TRACKED <b>$42K</b></span>
+    <span>ACTIVE BRANDS <b>84</b></span>
+    <!-- duplicate for seamless loop -->
+    <span class="up">VELOCITY RUNNING <b>↑ +212%</b></span>
+    <span>AI SCORE AVG <b>93.4</b></span>
+    <span class="up">CHRONOS WATCH <b>↑ HIGH DEMAND</b></span>
+    <span>PRODUCTS SCANNED <b>1,284</b></span>
+    <span class="up">STREETWEAR <b>↑ TIKTOK SURGE</b></span>
+    <span>PREDICTION ACCURACY <b>91%</b></span>
+    <span class="up">REVENUE TRACKED <b>$42K</b></span>
+    <span>ACTIVE BRANDS <b>84</b></span>
+  </div>
+</div>
+
+<!-- HERO -->
 <section class="hero">
-
   <div>
-
-    <h1>
-      AI Finds
-      <span>Winning Products</span>
-      Before They Trend
+    <div class="hero-eyebrow fade-up">
+      <span>●</span> AI Product Intelligence — v3.2
+    </div>
+    <h1 class="fade-up">
+      Find <span class="hl">Winning</span><br>
+      Products <em>before</em><br>
+      They Trend
     </h1>
-
-    <p>
-      Meridian Market autonomously scans viral demand,
-      predicts breakout products, and helps ecommerce
-      brands launch profitable products before competitors react.
+    <p class="hero-sub fade-up">
+      Meridian autonomously scans viral demand, predicts breakout
+      products, and helps ecommerce brands launch profitably — before competitors react.
     </p>
-
-    <div class="hero-actions">
-
-      <a href="#products" class="btn primary">
+    <div class="hero-actions fade-up">
+      <a href="#products" class="btn-primary">
         Explore Products
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-
-      <a href="#" class="btn secondary">
-        Book Strategy Call
-      </a>
-
+      <a href="#audit" class="btn-ghost">Book Strategy Call</a>
     </div>
-
-    <div class="trust-bar">
-
-      <div class="trust">
-        Stripe Secure
-      </div>
-
-      <div class="trust">
-        AI Product Scoring
-      </div>
-
-      <div class="trust">
-        Realtime Trend Detection
-      </div>
-
-      <div class="trust">
-        Shopify Ready
-      </div>
-
+    <div class="trust-row fade-up">
+      <div class="trust-item">Stripe Secure</div>
+      <div class="trust-item">Shopify Ready</div>
+      <div class="trust-item">Realtime Signals</div>
     </div>
-
   </div>
 
-  <div class="panel">
-
-    <div class="panel-top">
-
-      <div class="panel-title">
-        Meridian Intelligence Layer
+  <!-- INTEL PANEL -->
+  <div class="hero-panel">
+    <div class="intel-card">
+      <div class="intel-header">
+        <div class="intel-title">Meridian Intelligence Layer</div>
+        <div class="live-badge">
+          <div class="status-dot"></div> LIVE
+        </div>
       </div>
 
-      <div class="live">
-        LIVE
+      <div class="intel-metrics">
+        <div class="intel-metric">
+          <div class="m-change up">↑ 8%</div>
+          <div class="m-val">1,284</div>
+          <div class="m-label">Products Scanned Today</div>
+        </div>
+        <div class="intel-metric">
+          <div class="m-change up">↑ 2%</div>
+          <div class="m-val green">91%</div>
+          <div class="m-label">AI Prediction Accuracy</div>
+        </div>
+        <div class="intel-metric">
+          <div class="m-val blue">84</div>
+          <div class="m-label">Active Brands Monitoring</div>
+        </div>
+        <div class="intel-metric">
+          <div class="m-change up">↑ 14%</div>
+          <div class="m-val amber">$42K</div>
+          <div class="m-label">Revenue Tracked</div>
+        </div>
       </div>
 
+      <!-- SPARKLINE CHART -->
+      <div class="chart-row">
+        <div class="chart-label">Trend Velocity — 7D</div>
+        <div class="sparkline">
+          <svg viewBox="0 0 440 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00e5a0" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#00e5a0" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 40 L60 35 L120 30 L180 22 L240 28 L300 15 L360 10 L440 4" stroke="#00e5a0" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M0 40 L60 35 L120 30 L180 22 L240 28 L300 15 L360 10 L440 4 L440 50 L0 50 Z" fill="url(#chartGrad)"/>
+            <!-- data points -->
+            <circle cx="440" cy="4" r="3" fill="#00e5a0"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- TOP SIGNALS -->
+      <div class="signals-row">
+        <div class="signal">
+          <div class="signal-dot" style="background:#00e5a0"></div>
+          <div class="signal-name">Velocity Running System</div>
+          <div class="signal-bar-wrap"><div class="signal-bar" style="width:94%"></div></div>
+          <div class="signal-score">94</div>
+        </div>
+        <div class="signal">
+          <div class="signal-dot" style="background:#ffb830"></div>
+          <div class="signal-name">Chronos Smart Watch</div>
+          <div class="signal-bar-wrap"><div class="signal-bar" style="width:97%;background:#ffb830"></div></div>
+          <div class="signal-score" style="color:#ffb830">97</div>
+        </div>
+        <div class="signal">
+          <div class="signal-dot" style="background:#4d9fff"></div>
+          <div class="signal-name">Meridian Streetwear</div>
+          <div class="signal-bar-wrap"><div class="signal-bar" style="width:91%;background:#4d9fff"></div></div>
+          <div class="signal-score" style="color:#4d9fff">91</div>
+        </div>
+      </div>
     </div>
-
-    <div class="metrics">
-
-      <div class="metric">
-        <div class="metric-value">
-          1,284
-        </div>
-
-        <div class="metric-label">
-          Products Scanned Today
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-value">
-          91%
-        </div>
-
-        <div class="metric-label">
-          AI Prediction Accuracy
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-value">
-          84
-        </div>
-
-        <div class="metric-label">
-          Active Brands Monitoring
-        </div>
-      </div>
-
-      <div class="metric">
-        <div class="metric-value">
-          $42K
-        </div>
-
-        <div class="metric-label">
-          Revenue Tracked
-        </div>
-      </div>
-
-    </div>
-
   </div>
-
 </section>
 
+<!-- HOW IT WORKS -->
 <section class="section" id="engine">
+  <div class="section-label">AI Engine</div>
+  <h2>How Meridian <em>Works</em></h2>
+  <p class="section-sub">Continuously scanning ecommerce markets, engagement spikes, and pricing data to surface high-probability winning products.</p>
 
-  <div class="section-header">
-
-    <h2>
-      How Meridian Works
-    </h2>
-
-    <p>
-      Meridian continuously scans ecommerce markets,
-      engagement spikes, conversion trends, and pricing data
-      to identify high-probability winning products.
-    </p>
-
+  <div class="steps-grid">
+    <div class="step" data-n="01">
+      <div class="step-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#00e5a0" stroke-width="1.5"/>
+          <circle cx="10" cy="10" r="2" fill="#00e5a0"/>
+          <path d="M10 3v2M10 15v2M3 10h2M15 10h2" stroke="#00e5a0" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="step-n">// 01</div>
+      <h3>AI Scans Trends</h3>
+      <p>Monitors realtime product demand, engagement velocity, and market movement across all major ecommerce channels — continuously, 24/7.</p>
+    </div>
+    <div class="step" data-n="02">
+      <div class="step-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="12" width="3" height="6" rx="1" fill="#00e5a0"/>
+          <rect x="7" y="8" width="3" height="10" rx="1" fill="#00e5a0" opacity=".7"/>
+          <rect x="12" y="4" width="3" height="14" rx="1" fill="#00e5a0" opacity=".4"/>
+          <rect x="17" y="1" width="1" height="17" rx=".5" fill="#00e5a0" opacity=".2"/>
+        </svg>
+      </div>
+      <div class="step-n">// 02</div>
+      <h3>AI Scores Products</h3>
+      <p>Every product receives a predictive profitability score using adaptive machine learning models trained on millions of conversion data points.</p>
+    </div>
+    <div class="step" data-n="03">
+      <div class="step-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10l4 4 8-8" stroke="#00e5a0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="step-n">// 03</div>
+      <h3>Launch Faster</h3>
+      <p>Deploy validated products into your ecommerce workflow before the market saturates — with one-click Shopify integration and ready-to-run ad copy.</p>
+    </div>
   </div>
-
-  <div class="steps">
-
-    <div class="step">
-
-      <div class="step-number">
-        01
-      </div>
-
-      <h3>
-        AI Scans Trends
-      </h3>
-
-      <p>
-        Meridian monitors realtime product demand,
-        engagement velocity, and market movement across ecommerce channels.
-      </p>
-
-    </div>
-
-    <div class="step">
-
-      <div class="step-number">
-        02
-      </div>
-
-      <h3>
-        AI Scores Products
-      </h3>
-
-      <p>
-        Every product receives a predictive profitability score
-        using adaptive machine learning models.
-      </p>
-
-    </div>
-
-    <div class="step">
-
-      <div class="step-number">
-        03
-      </div>
-
-      <h3>
-        Launch Faster
-      </h3>
-
-      <p>
-        Deploy validated products into your ecommerce workflow
-        before the market becomes saturated.
-      </p>
-
-    </div>
-
-  </div>
-
 </section>
 
-<section class="section" id="products">
-
-  <div class="section-header">
-
-    <h2>
-      AI Selected Products
-    </h2>
-
-    <p>
-      High-performing products identified through autonomous
-      trend analysis and predictive conversion intelligence.
-    </p>
-
+<!-- PRODUCTS -->
+<section class="section" id="products" style="padding-top:20px">
+  <div class="products-header">
+    <div>
+      <div class="section-label">AI Selected</div>
+      <h2>Winning <em>Products</em></h2>
+    </div>
+    <div class="filter-tabs">
+      <div class="filter-tab active">All</div>
+      <div class="filter-tab">Trending</div>
+      <div class="filter-tab">High ROAS</div>
+    </div>
   </div>
 
-  <div class="grid">
+  <div class="products-grid">
 
-    <div class="card">
-
-      <img
-        src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop"
-      />
-
-      <div class="content">
-
-        <div class="badge">
-          AI VERIFIED
+    <!-- Card 1 -->
+    <div class="product-card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop" alt="Velocity Running System"/>
+        <div class="card-overlay"></div>
+        <div class="card-badges">
+          <div class="badge badge-verified">AI Verified</div>
         </div>
-
-        <div class="title">
-          Velocity Running System
+        <div class="card-score-badge">
+          <div class="score-num">94</div>
+          <div class="score-sub">Score</div>
         </div>
-
-        <div class="desc">
-          AI-selected footwear product with strong engagement velocity
-          and increasing conversion probability.
-        </div>
-
-        <div class="meta">
-
-          <div class="price">
-            $129
-          </div>
-
-          <div class="score">
-
-            <div class="score-label">
-              AI SCORE
-            </div>
-
-            <div class="score-value">
-              94
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="tags">
-
-          <div class="tag">
-            ROAS 4.8x
-          </div>
-
-          <div class="tag">
-            Trend Velocity +212%
-          </div>
-
-          <div class="tag">
-            In Stock
-          </div>
-
-        </div>
-
-        <button class="buy">
-          Buy Now
-        </button>
-
       </div>
-
+      <div class="card-body">
+        <div class="card-title">Velocity Running System</div>
+        <div class="card-desc">AI-selected footwear with strong engagement velocity and increasing conversion probability across key demographics.</div>
+        <div class="card-meta">
+          <div class="card-price">$129</div>
+          <div class="roas">
+            <div class="roas-val">4.8×</div>
+            <div class="roas-label">ROAS</div>
+          </div>
+        </div>
+        <div class="card-velocity">
+          <div class="vel-label">
+            <span>Trend Velocity</span>
+            <span class="vel-val">+212%</span>
+          </div>
+          <div class="vel-bar-track"><div class="vel-bar" style="width:84%"></div></div>
+        </div>
+        <div class="card-tags">
+          <div class="tag">In Stock</div>
+          <div class="tag">Shopify Ready</div>
+          <div class="tag">Fast Shipping</div>
+        </div>
+        <button class="btn-buy">
+          Add to Store
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class="card">
-
-      <img
-        src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop"
-      />
-
-      <div class="content">
-
-        <div class="badge">
-          AI WINNER
+    <!-- Card 2 -->
+    <div class="product-card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop" alt="Chronos Smart Watch"/>
+        <div class="card-overlay"></div>
+        <div class="card-badges">
+          <div class="badge badge-winner">AI Winner</div>
+          <div class="badge badge-hot">Hot</div>
         </div>
-
-        <div class="title">
-          Chronos Smart Watch
+        <div class="card-score-badge">
+          <div class="score-num" style="color:#ffb830">97</div>
+          <div class="score-sub">Score</div>
         </div>
-
-        <div class="desc">
-          High-conversion wearable product with strong audience retention
-          and repeat purchase indicators.
-        </div>
-
-        <div class="meta">
-
-          <div class="price">
-            $179
-          </div>
-
-          <div class="score">
-
-            <div class="score-label">
-              AI SCORE
-            </div>
-
-            <div class="score-value">
-              97
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="tags">
-
-          <div class="tag">
-            High Demand
-          </div>
-
-          <div class="tag">
-            Trending
-          </div>
-
-          <div class="tag">
-            Limited Supply
-          </div>
-
-        </div>
-
-        <button class="buy">
-          Buy Now
-        </button>
-
       </div>
-
+      <div class="card-body">
+        <div class="card-title">Chronos Smart Watch</div>
+        <div class="card-desc">High-conversion wearable with strong audience retention, repeat purchase indicators, and rising demand across all channels.</div>
+        <div class="card-meta">
+          <div class="card-price">$179</div>
+          <div class="roas">
+            <div class="roas-val" style="color:#ffb830">6.2×</div>
+            <div class="roas-label">ROAS</div>
+          </div>
+        </div>
+        <div class="card-velocity">
+          <div class="vel-label">
+            <span>Trend Velocity</span>
+            <span class="vel-val">+341%</span>
+          </div>
+          <div class="vel-bar-track"><div class="vel-bar" style="width:97%;background:linear-gradient(90deg,#c97a00,#ffb830)"></div></div>
+        </div>
+        <div class="card-tags">
+          <div class="tag">High Demand</div>
+          <div class="tag">Limited Supply</div>
+          <div class="tag">Trending</div>
+        </div>
+        <button class="btn-buy">
+          Add to Store
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class="card">
-
-      <img
-        src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop"
-      />
-
-      <div class="content">
-
-        <div class="badge">
-          AI VERIFIED
+    <!-- Card 3 -->
+    <div class="product-card">
+      <div class="card-img-wrap">
+        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop" alt="Meridian Streetwear"/>
+        <div class="card-overlay"></div>
+        <div class="card-badges">
+          <div class="badge badge-verified">AI Verified</div>
         </div>
-
-        <div class="title">
-          Meridian Streetwear Collection
+        <div class="card-score-badge">
+          <div class="score-num" style="color:#4d9fff">91</div>
+          <div class="score-sub">Score</div>
         </div>
-
-        <div class="desc">
-          AI-detected fashion product category with rising conversion
-          trends across social commerce channels.
-        </div>
-
-        <div class="meta">
-
-          <div class="price">
-            $89
-          </div>
-
-          <div class="score">
-
-            <div class="score-label">
-              AI SCORE
-            </div>
-
-            <div class="score-value">
-              91
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="tags">
-
-          <div class="tag">
-            TikTok Demand
-          </div>
-
-          <div class="tag">
-            Growth Market
-          </div>
-
-          <div class="tag">
-            Realtime Trending
-          </div>
-
-        </div>
-
-        <button class="buy">
-          Buy Now
-        </button>
-
       </div>
-
+      <div class="card-body">
+        <div class="card-title">Meridian Streetwear</div>
+        <div class="card-desc">AI-detected fashion category with rising conversion trends across TikTok social commerce and Instagram discovery channels.</div>
+        <div class="card-meta">
+          <div class="card-price">$89</div>
+          <div class="roas">
+            <div class="roas-val" style="color:#4d9fff">5.1×</div>
+            <div class="roas-label">ROAS</div>
+          </div>
+        </div>
+        <div class="card-velocity">
+          <div class="vel-label">
+            <span>Trend Velocity</span>
+            <span class="vel-val" style="color:#4d9fff">+178%</span>
+          </div>
+          <div class="vel-bar-track"><div class="vel-bar" style="width:71%;background:linear-gradient(90deg,#1a5fb4,#4d9fff)"></div></div>
+        </div>
+        <div class="card-tags">
+          <div class="tag">TikTok Demand</div>
+          <div class="tag">Growth Market</div>
+          <div class="tag">Realtime Trending</div>
+        </div>
+        <button class="btn-buy">
+          Add to Store
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
 
   </div>
-
 </section>
 
-<section class="cta" id="audit">
-
-  <h2>
-    Start Finding Winning Products Today
-  </h2>
-
-  <p>
-    Book a free strategy call and discover how Meridian helps ecommerce
-    brands identify profitable products before competitors react.
-  </p>
-
-  <div class="hero-actions">
-
-    <a href="#" class="btn primary">
-      Book Free Strategy Call
-    </a>
-
-    <a href="#" class="btn secondary">
-      Start AI Audit
-    </a>
-
+<!-- CTA -->
+<div class="cta-section" id="audit">
+  <div class="cta-inner">
+    <div>
+      <div class="cta-label">// Free Audit Available</div>
+      <h2>Start Finding <em>Winning</em> Products Today</h2>
+      <p class="cta-sub">Book a free strategy call and discover how Meridian helps ecommerce brands identify profitable products before competitors react.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn-primary">
+          Book Free Strategy Call
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#" class="btn-ghost">Start AI Audit</a>
+      </div>
+    </div>
+    <div class="cta-right">
+      <div class="cta-stat">
+        <div class="cta-stat-val">91%</div>
+        <div class="cta-stat-info">
+          <div class="cta-stat-label">Prediction Accuracy</div>
+          <div class="cta-stat-sub">Across all product categories</div>
+        </div>
+      </div>
+      <div class="cta-stat">
+        <div class="cta-stat-val">4.8×</div>
+        <div class="cta-stat-info">
+          <div class="cta-stat-label">Average ROAS</div>
+          <div class="cta-stat-sub">For AI-verified products</div>
+        </div>
+      </div>
+      <div class="cta-stat">
+        <div class="cta-stat-val">84</div>
+        <div class="cta-stat-info">
+          <div class="cta-stat-label">Active Brands</div>
+          <div class="cta-stat-sub">Monitoring with Meridian today</div>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
 
-</section>
-
+<!-- FOOTER -->
 <footer>
-
-  © 2026 Meridian Market by NorthSky
-
+  <div class="footer-copy">© 2026 Meridian Market by NorthSky</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">API Docs</a>
+    <a href="#">Contact</a>
+  </div>
 </footer>
 
-<a href="#audit" class="floating">
+<!-- FLOATING -->
+<a href="#audit" class="floating-cta">
   Start Now
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </a>
 
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.15;
+  ry += (my - ry) * 0.15;
+  ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .filter-tab').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.transform += ' scale(2)';
+    ring.style.width = '56px';
+    ring.style.height = '56px';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.width = '36px';
+    ring.style.height = '36px';
+  });
+});
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// Animate signal bars on load
+window.addEventListener('load', () => {
+  document.querySelectorAll('.signal-bar').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = w; }, 400);
+  });
+});
+</script>
 </body>
 </html>
