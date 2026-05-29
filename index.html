@@ -2,16 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Meridian Market by NorthSky</title>
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+Meridian Market — AI Product Intelligence
+</title>
 
 <meta
   name="description"
-  content="Luxury AI-powered commerce storefront by NorthSky with autonomous product intelligence and real-time product scoring."
+  content="AI-powered ecommerce intelligence platform that discovers and scores winning products before they trend."
 />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link
   href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
   rel="stylesheet"
@@ -20,29 +27,26 @@
 <style>
 
 :root{
-  --bg:#eef3f7;
-  --bg2:#dce6ee;
 
-  --glass:rgba(255,255,255,0.45);
-  --glass-strong:rgba(255,255,255,0.7);
+  --bg:#edf3f8;
+  --bg2:#dbe7f2;
 
-  --border:rgba(255,255,255,0.55);
+  --text:#172230;
+  --muted:#66768a;
 
-  --text:#1b2431;
-  --muted:#607086;
+  --white:#ffffff;
 
-  --silver:#cfd8e3;
-  --silver2:#f8fbff;
+  --blue:#5edcff;
+  --blue2:#2ca9ff;
 
-  --aqua:#58d7ff;
-  --aqua2:#8cecff;
+  --glass:rgba(255,255,255,.48);
+
+  --border:rgba(255,255,255,.72);
 
   --shadow:
     0 10px 30px rgba(0,0,0,.08),
     0 2px 10px rgba(0,0,0,.04);
 
-  --glow:
-    0 0 40px rgba(88,215,255,.22);
 }
 
 *{
@@ -56,62 +60,74 @@ html{
 }
 
 body{
+
   font-family:Inter,sans-serif;
+
   background:
-    radial-gradient(circle at top left,#ffffff 0%,#eef4fa 28%,#dde7f1 70%,#d3dce7 100%);
+    radial-gradient(
+      circle at top left,
+      #ffffff 0%,
+      #edf4fa 25%,
+      #dce6f0 70%,
+      #d0dae5 100%
+    );
+
   color:var(--text);
+
   overflow-x:hidden;
-  min-height:100vh;
 }
 
-/* BACKGROUND BLOBS */
+/* BACKGROUND */
 
-.bg-blur{
+.bg{
   position:fixed;
   border-radius:999px;
   filter:blur(100px);
   z-index:-1;
-  opacity:.55;
+  opacity:.6;
 }
 
-.blur1{
-  width:340px;
-  height:340px;
-  background:#aeefff;
+.bg1{
+  width:320px;
+  height:320px;
+  background:#a9edff;
   top:-100px;
   left:-80px;
 }
 
-.blur2{
+.bg2{
   width:420px;
   height:420px;
   background:#ffffff;
   right:-120px;
-  top:80px;
+  top:60px;
 }
 
-.blur3{
-  width:320px;
-  height:320px;
-  background:#b7e7ff;
-  bottom:-120px;
+.bg3{
+  width:300px;
+  height:300px;
+  background:#b5e9ff;
+  bottom:-100px;
   left:40%;
 }
 
 /* NAV */
 
 nav{
+
   position:sticky;
   top:0;
   z-index:999;
 
   backdrop-filter:blur(24px);
+
   background:rgba(255,255,255,.38);
 
-  border-bottom:1px solid rgba(255,255,255,.5);
+  border-bottom:1px solid rgba(255,255,255,.55);
 }
 
 .nav-inner{
+
   max-width:1380px;
   margin:auto;
 
@@ -123,71 +139,72 @@ nav{
 }
 
 .logo{
+
   font-size:22px;
   font-weight:800;
   letter-spacing:-1px;
 }
 
 .logo span{
-  background:linear-gradient(
-    135deg,
-    #59d5ff,
-    #7cecff
-  );
+
+  background:
+    linear-gradient(
+      135deg,
+      #59d5ff,
+      #7cecff
+    );
 
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
 .nav-links{
+
   display:flex;
   align-items:center;
   gap:18px;
 }
 
 .nav-links a{
+
   text-decoration:none;
   color:var(--muted);
+
   font-size:14px;
   font-weight:600;
-  transition:.2s;
-}
-
-.nav-links a:hover{
-  color:#1d2d3e;
 }
 
 .launch-btn{
+
   padding:12px 18px;
   border-radius:14px;
 
-  color:#0b1d2d !important;
+  color:#122434 !important;
 
   background:
     linear-gradient(
       135deg,
       rgba(255,255,255,.95),
-      rgba(161,240,255,.75)
+      rgba(161,240,255,.72)
     );
 
-  border:1px solid rgba(255,255,255,.8);
+  border:1px solid rgba(255,255,255,.82);
 
   box-shadow:
-    0 8px 24px rgba(88,215,255,.18);
-
-  backdrop-filter:blur(18px);
+    0 8px 24px rgba(88,215,255,.16);
 }
 
 /* HERO */
 
 .hero{
+
   max-width:1380px;
   margin:auto;
 
   padding:
-    100px
+    110px
     28px
-    60px;
+    70px;
 
   display:grid;
   grid-template-columns:1.1fr .9fr;
@@ -195,18 +212,20 @@ nav{
   align-items:center;
 }
 
-.hero-left h1{
-  font-size:78px;
-  line-height:.95;
+.hero h1{
+
+  font-size:82px;
+  line-height:.94;
   letter-spacing:-4px;
   font-weight:800;
 }
 
-.hero-left h1 span{
+.hero h1 span{
+
   background:
     linear-gradient(
       135deg,
-      #78e7ff,
+      #72e6ff,
       #2ca9ff
     );
 
@@ -214,17 +233,20 @@ nav{
   -webkit-text-fill-color:transparent;
 }
 
-.hero-left p{
-  margin-top:24px;
-  max-width:760px;
+.hero p{
+
+  margin-top:26px;
+
+  max-width:720px;
 
   color:var(--muted);
 
-  font-size:17px;
+  font-size:18px;
   line-height:1.8;
 }
 
 .hero-actions{
+
   margin-top:34px;
 
   display:flex;
@@ -233,132 +255,133 @@ nav{
 }
 
 .btn{
+
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
-  padding:15px 20px;
+  padding:15px 22px;
 
   border-radius:18px;
 
-  font-weight:700;
   text-decoration:none;
+
+  font-weight:700;
 
   transition:.22s;
 }
 
 .primary{
+
   background:
     linear-gradient(
       135deg,
       #ffffff,
-      #b7eeff
+      #b5edff
     );
 
-  color:#122434;
+  color:#132534;
 
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid rgba(255,255,255,.88);
 
   box-shadow:
-    0 12px 30px rgba(88,215,255,.18);
-}
-
-.primary:hover{
-  transform:translateY(-2px);
+    0 12px 28px rgba(88,215,255,.18);
 }
 
 .secondary{
-  background:rgba(255,255,255,.28);
 
-  border:1px solid rgba(255,255,255,.6);
+  background:rgba(255,255,255,.3);
+
+  border:1px solid rgba(255,255,255,.65);
 
   backdrop-filter:blur(20px);
 
-  color:#223345;
+  color:#223344;
 }
 
-.secondary:hover{
-  background:rgba(255,255,255,.45);
+.btn:hover{
+  transform:translateY(-2px);
 }
 
-/* HERO PANEL */
+/* TRUST BAR */
 
-.hero-panel{
+.trust-bar{
+
+  margin-top:38px;
+
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.trust{
+
+  padding:12px 16px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.4);
+
+  border:1px solid rgba(255,255,255,.65);
+
+  font-size:12px;
+  font-weight:700;
+
+  color:#4c6074;
+}
+
+/* PANEL */
+
+.panel{
+
   position:relative;
+
+  padding:28px;
+
+  border-radius:34px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(255,255,255,.55),
+      rgba(255,255,255,.58),
       rgba(255,255,255,.22)
     );
 
   border:1px solid rgba(255,255,255,.75);
 
-  border-radius:34px;
-
-  padding:26px;
+  backdrop-filter:blur(28px);
 
   box-shadow:
     var(--shadow),
-    var(--glow);
-
-  backdrop-filter:blur(28px);
+    0 0 40px rgba(88,215,255,.18);
 
   overflow:hidden;
 }
 
-.hero-panel::before{
-  content:"";
-
-  position:absolute;
-  inset:0;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.5),
-      transparent
-    );
-
-  pointer-events:none;
-}
-
 .panel-top{
+
   display:flex;
   align-items:center;
   justify-content:space-between;
 }
 
 .panel-title{
+
   font-size:18px;
   font-weight:700;
 }
 
 .live{
-  display:flex;
-  align-items:center;
-  gap:8px;
 
   font-size:12px;
   font-weight:700;
 
-  color:#1eaed6;
+  color:#2ca9ff;
 }
 
-.dot{
-  width:9px;
-  height:9px;
+.metrics{
 
-  border-radius:999px;
-
-  background:#59d5ff;
-
-  box-shadow:0 0 14px #59d5ff;
-}
-
-.metric-grid{
-  margin-top:22px;
+  margin-top:24px;
 
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -366,28 +389,31 @@ nav{
 }
 
 .metric{
+
+  padding:20px;
+
+  border-radius:24px;
+
   background:
     linear-gradient(
       145deg,
       rgba(255,255,255,.42),
-      rgba(255,255,255,.2)
+      rgba(255,255,255,.18)
     );
 
-  border:1px solid rgba(255,255,255,.55);
+  border:1px solid rgba(255,255,255,.62);
 
-  border-radius:24px;
-
-  padding:20px;
-
-  backdrop-filter:blur(18px);
+  backdrop-filter:blur(16px);
 }
 
 .metric-value{
+
   font-size:34px;
   font-weight:800;
 }
 
 .metric-label{
+
   margin-top:6px;
 
   color:var(--muted);
@@ -398,70 +424,129 @@ nav{
 /* SECTION */
 
 .section{
+
   max-width:1380px;
   margin:auto;
 
   padding:
-    20px
+    30px
     28px
-    80px;
+    90px;
 }
 
 .section-header{
-  margin-bottom:34px;
+
+  margin-bottom:36px;
 }
 
 .section-header h2{
-  font-size:42px;
+
+  font-size:44px;
   letter-spacing:-2px;
 }
 
 .section-header p{
+
   margin-top:14px;
 
   max-width:760px;
 
   color:var(--muted);
 
-  line-height:1.7;
+  line-height:1.8;
 }
 
-/* GRID */
+/* STEPS */
 
-.grid{
+.steps{
+
   display:grid;
   grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
+    repeat(auto-fit,minmax(280px,1fr));
 
   gap:24px;
 }
 
-/* PRODUCT CARD */
+.step{
 
-.card{
-  position:relative;
+  padding:32px;
+
+  border-radius:30px;
 
   background:
     linear-gradient(
       145deg,
       rgba(255,255,255,.52),
-      rgba(255,255,255,.2)
+      rgba(255,255,255,.22)
     );
 
   border:1px solid rgba(255,255,255,.7);
 
-  border-radius:30px;
+  backdrop-filter:blur(22px);
+
+  box-shadow:var(--shadow);
+}
+
+.step-number{
+
+  font-size:13px;
+  font-weight:800;
+
+  color:#2ca9ff;
+
+  margin-bottom:14px;
+}
+
+.step h3{
+
+  font-size:24px;
+
+  margin-bottom:14px;
+}
+
+.step p{
+
+  color:var(--muted);
+
+  line-height:1.8;
+}
+
+/* PRODUCTS */
+
+.grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(auto-fit,minmax(320px,1fr));
+
+  gap:24px;
+}
+
+.card{
 
   overflow:hidden;
 
-  transition:.28s;
+  border-radius:32px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.55),
+      rgba(255,255,255,.2)
+    );
+
+  border:1px solid rgba(255,255,255,.72);
+
+  backdrop-filter:blur(24px);
 
   box-shadow:var(--shadow);
 
-  backdrop-filter:blur(24px);
+  transition:.28s;
 }
 
 .card:hover{
+
   transform:translateY(-8px);
 
   box-shadow:
@@ -469,84 +554,57 @@ nav{
     0 10px 24px rgba(0,0,0,.08);
 }
 
-.card::before{
-  content:"";
+.card img{
 
-  position:absolute;
-  inset:0;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.28),
-      transparent
-    );
-
-  pointer-events:none;
-}
-
-.img-wrap{
-  position:relative;
-}
-
-.img{
   width:100%;
   height:280px;
   object-fit:cover;
-
-  background:#dce4eb;
 }
 
-/* BADGES */
+.content{
+  padding:24px;
+}
 
-.ai-badge{
-  position:absolute;
-  top:18px;
-  left:18px;
+.badge{
+
+  display:inline-flex;
 
   padding:10px 14px;
 
   border-radius:999px;
 
+  background:rgba(255,255,255,.5);
+
+  border:1px solid rgba(255,255,255,.72);
+
   font-size:11px;
   font-weight:700;
 
-  background:rgba(255,255,255,.52);
-
-  border:1px solid rgba(255,255,255,.75);
-
-  backdrop-filter:blur(14px);
-
-  color:#148db0;
-}
-
-.winner{
-  color:#00a870;
-}
-
-.content{
-  padding:22px;
+  color:#178fb2;
 }
 
 .title{
-  font-size:18px;
+
+  margin-top:18px;
+
+  font-size:20px;
   font-weight:700;
-  line-height:1.45;
 }
 
 .desc{
+
   margin-top:12px;
 
   color:var(--muted);
 
   line-height:1.7;
-  font-size:13px;
+
+  font-size:14px;
 }
 
-/* META */
-
 .meta{
-  margin-top:22px;
+
+  margin-top:24px;
 
   display:flex;
   justify-content:space-between;
@@ -554,33 +612,37 @@ nav{
 }
 
 .price{
-  font-size:28px;
+
+  font-size:30px;
   font-weight:800;
-  color:#00a678;
+
+  color:#00a977;
 }
 
 .score{
+
   text-align:right;
 }
 
 .score-label{
+
   font-size:11px;
   color:var(--muted);
 }
 
 .score-value{
-  margin-top:2px;
 
-  font-size:17px;
+  margin-top:3px;
+
+  font-size:18px;
   font-weight:700;
 
   color:#2ca9ff;
 }
 
-/* TAGS */
-
 .tags{
-  margin-top:18px;
+
+  margin-top:20px;
 
   display:flex;
   flex-wrap:wrap;
@@ -588,6 +650,7 @@ nav{
 }
 
 .tag{
+
   padding:8px 12px;
 
   border-radius:999px;
@@ -599,33 +662,26 @@ nav{
   font-size:11px;
   font-weight:700;
 
-  color:#506072;
-
-  backdrop-filter:blur(10px);
+  color:#516273;
 }
-
-.stock-low{
-  color:#c56a6a;
-}
-
-/* BUTTON */
 
 .buy{
-  margin-top:22px;
 
   width:100%;
 
-  border:none;
-  cursor:pointer;
+  margin-top:22px;
 
   padding:15px;
+
+  border:none;
+  cursor:pointer;
 
   border-radius:18px;
 
   font-weight:800;
   font-size:14px;
 
-  color:#0f2430;
+  color:#102433;
 
   background:
     linear-gradient(
@@ -638,71 +694,60 @@ nav{
 
   box-shadow:
     0 10px 24px rgba(88,215,255,.18);
-
-  transition:.22s;
 }
 
-.buy:hover{
-  transform:translateY(-2px);
-}
+/* CTA */
 
-.buy:disabled{
-  background:#d1d7dd;
-  color:#6b7280;
-  cursor:not-allowed;
-  box-shadow:none;
-}
+.cta{
 
-/* LOADING */
+  max-width:1180px;
 
-.loading-grid{
-  display:grid;
-  grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
+  margin:80px auto;
 
-  gap:24px;
-}
+  padding:60px;
 
-.skeleton{
-  height:480px;
+  text-align:center;
 
-  border-radius:30px;
+  border-radius:40px;
 
   background:
     linear-gradient(
-      90deg,
-      rgba(255,255,255,.35),
-      rgba(255,255,255,.7),
-      rgba(255,255,255,.35)
+      145deg,
+      rgba(255,255,255,.58),
+      rgba(255,255,255,.24)
     );
 
-  background-size:200% 100%;
+  border:1px solid rgba(255,255,255,.72);
 
-  animation:shimmer 1.4s infinite;
+  backdrop-filter:blur(26px);
+
+  box-shadow:
+    0 20px 60px rgba(88,215,255,.16);
 }
 
-@keyframes shimmer{
-  0%{
-    background-position:200% 0;
-  }
+.cta h2{
 
-  100%{
-    background-position:-200% 0;
-  }
+  font-size:52px;
+  line-height:1;
+  letter-spacing:-2px;
 }
 
-/* EMPTY */
+.cta p{
 
-.empty{
-  padding:80px 20px;
-  text-align:center;
+  margin-top:20px;
+
   color:var(--muted);
+
+  max-width:720px;
+
+  margin-inline:auto;
+
+  line-height:1.8;
 }
 
 /* FOOTER */
 
 footer{
-  margin-top:70px;
 
   padding:50px 24px;
 
@@ -710,11 +755,43 @@ footer{
 
   color:var(--muted);
 
-  border-top:1px solid rgba(255,255,255,.45);
+  border-top:1px solid rgba(255,255,255,.5);
 
-  background:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.2);
 
   backdrop-filter:blur(18px);
+}
+
+/* FLOATING CTA */
+
+.floating{
+
+  position:fixed;
+
+  right:24px;
+  bottom:24px;
+
+  z-index:9999;
+
+  padding:16px 22px;
+
+  border-radius:18px;
+
+  text-decoration:none;
+
+  font-weight:800;
+
+  color:#102433;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #8cecff
+    );
+
+  box-shadow:
+    0 14px 40px rgba(88,215,255,.28);
 }
 
 /* MOBILE */
@@ -723,31 +800,30 @@ footer{
 
   .hero{
     grid-template-columns:1fr;
-    padding-top:70px;
   }
 
-  .hero-left h1{
+  .hero h1{
     font-size:58px;
   }
 }
 
 @media(max-width:640px){
 
-  .hero-left h1{
+  .hero h1{
     font-size:44px;
     letter-spacing:-2px;
   }
 
   .section-header h2{
-    font-size:32px;
+    font-size:34px;
   }
 
-  .nav-links{
-    gap:10px;
+  .cta h2{
+    font-size:38px;
   }
 
-  .nav-links a{
-    font-size:12px;
+  .metrics{
+    grid-template-columns:1fr;
   }
 }
 
@@ -756,9 +832,9 @@ footer{
 
 <body>
 
-<div class="bg-blur blur1"></div>
-<div class="bg-blur blur2"></div>
-<div class="bg-blur blur3"></div>
+<div class="bg bg1"></div>
+<div class="bg bg2"></div>
+<div class="bg bg3"></div>
 
 <nav>
 
@@ -769,13 +845,23 @@ footer{
     </div>
 
     <div class="nav-links">
-      <a href="#products-section">Products</a>
-      <a href="#intelligence">AI Engine</a>
-      <a href="#">Analytics</a>
+
+      <a href="#products">
+        Products
+      </a>
+
+      <a href="#engine">
+        AI Engine
+      </a>
+
+      <a href="#audit">
+        Audit
+      </a>
 
       <a href="#" class="launch-btn">
-        Launch System
+        Book Demo
       </a>
+
     </div>
 
   </div>
@@ -784,74 +870,105 @@ footer{
 
 <section class="hero">
 
-  <div class="hero-left">
+  <div>
 
     <h1>
-      Luxury AI
-      <span>Commerce Intelligence</span>
+      AI Finds
+      <span>Winning Products</span>
+      Before They Trend
     </h1>
 
     <p>
-      Meridian Market by NorthSky autonomously discovers,
-      scores, and launches premium products using
-      real-time AI analytics, autonomous product mining,
-      and adaptive sales intelligence.
+      Meridian Market autonomously scans viral demand,
+      predicts breakout products, and helps ecommerce
+      brands launch profitable products before competitors react.
     </p>
 
     <div class="hero-actions">
 
-      <a href="#products-section" class="btn primary">
+      <a href="#products" class="btn primary">
         Explore Products
       </a>
 
       <a href="#" class="btn secondary">
-        View AI Engine
+        Book Strategy Call
       </a>
+
+    </div>
+
+    <div class="trust-bar">
+
+      <div class="trust">
+        Stripe Secure
+      </div>
+
+      <div class="trust">
+        AI Product Scoring
+      </div>
+
+      <div class="trust">
+        Realtime Trend Detection
+      </div>
+
+      <div class="trust">
+        Shopify Ready
+      </div>
 
     </div>
 
   </div>
 
-  <div class="hero-panel">
+  <div class="panel">
 
     <div class="panel-top">
 
       <div class="panel-title">
-        NorthSky Intelligence Layer
+        Meridian Intelligence Layer
       </div>
 
       <div class="live">
-        <div class="dot"></div>
         LIVE
       </div>
 
     </div>
 
-    <div class="metric-grid">
+    <div class="metrics">
 
       <div class="metric">
-        <div class="metric-value">247</div>
+        <div class="metric-value">
+          1,284
+        </div>
+
         <div class="metric-label">
-          Products Analyzed
+          Products Scanned Today
         </div>
       </div>
 
       <div class="metric">
-        <div class="metric-value">91%</div>
+        <div class="metric-value">
+          91%
+        </div>
+
         <div class="metric-label">
-          AI Accuracy
+          AI Prediction Accuracy
         </div>
       </div>
 
       <div class="metric">
-        <div class="metric-value">18</div>
+        <div class="metric-value">
+          84
+        </div>
+
         <div class="metric-label">
-          Winning Products
+          Active Brands Monitoring
         </div>
       </div>
 
       <div class="metric">
-        <div class="metric-value">$42k</div>
+        <div class="metric-value">
+          $42K
+        </div>
+
         <div class="metric-label">
           Revenue Tracked
         </div>
@@ -863,7 +980,80 @@ footer{
 
 </section>
 
-<section class="section" id="products-section">
+<section class="section" id="engine">
+
+  <div class="section-header">
+
+    <h2>
+      How Meridian Works
+    </h2>
+
+    <p>
+      Meridian continuously scans ecommerce markets,
+      engagement spikes, conversion trends, and pricing data
+      to identify high-probability winning products.
+    </p>
+
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+
+      <div class="step-number">
+        01
+      </div>
+
+      <h3>
+        AI Scans Trends
+      </h3>
+
+      <p>
+        Meridian monitors realtime product demand,
+        engagement velocity, and market movement across ecommerce channels.
+      </p>
+
+    </div>
+
+    <div class="step">
+
+      <div class="step-number">
+        02
+      </div>
+
+      <h3>
+        AI Scores Products
+      </h3>
+
+      <p>
+        Every product receives a predictive profitability score
+        using adaptive machine learning models.
+      </p>
+
+    </div>
+
+    <div class="step">
+
+      <div class="step-number">
+        03
+      </div>
+
+      <h3>
+        Launch Faster
+      </h3>
+
+      <p>
+        Deploy validated products into your ecommerce workflow
+        before the market becomes saturated.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="section" id="products">
 
   <div class="section-header">
 
@@ -872,256 +1062,247 @@ footer{
     </h2>
 
     <p>
-      Every product is analyzed through Meridian’s
-      autonomous scoring engine using engagement velocity,
-      conversion probability, pricing intelligence,
-      and live market trend data.
+      High-performing products identified through autonomous
+      trend analysis and predictive conversion intelligence.
     </p>
 
   </div>
 
-  <div id="products" class="loading-grid">
+  <div class="grid">
 
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
+    <div class="card">
+
+      <img
+        src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop"
+      />
+
+      <div class="content">
+
+        <div class="badge">
+          AI VERIFIED
+        </div>
+
+        <div class="title">
+          Velocity Running System
+        </div>
+
+        <div class="desc">
+          AI-selected footwear product with strong engagement velocity
+          and increasing conversion probability.
+        </div>
+
+        <div class="meta">
+
+          <div class="price">
+            $129
+          </div>
+
+          <div class="score">
+
+            <div class="score-label">
+              AI SCORE
+            </div>
+
+            <div class="score-value">
+              94
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="tags">
+
+          <div class="tag">
+            ROAS 4.8x
+          </div>
+
+          <div class="tag">
+            Trend Velocity +212%
+          </div>
+
+          <div class="tag">
+            In Stock
+          </div>
+
+        </div>
+
+        <button class="buy">
+          Buy Now
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <img
+        src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop"
+      />
+
+      <div class="content">
+
+        <div class="badge">
+          AI WINNER
+        </div>
+
+        <div class="title">
+          Chronos Smart Watch
+        </div>
+
+        <div class="desc">
+          High-conversion wearable product with strong audience retention
+          and repeat purchase indicators.
+        </div>
+
+        <div class="meta">
+
+          <div class="price">
+            $179
+          </div>
+
+          <div class="score">
+
+            <div class="score-label">
+              AI SCORE
+            </div>
+
+            <div class="score-value">
+              97
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="tags">
+
+          <div class="tag">
+            High Demand
+          </div>
+
+          <div class="tag">
+            Trending
+          </div>
+
+          <div class="tag">
+            Limited Supply
+          </div>
+
+        </div>
+
+        <button class="buy">
+          Buy Now
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <img
+        src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop"
+      />
+
+      <div class="content">
+
+        <div class="badge">
+          AI VERIFIED
+        </div>
+
+        <div class="title">
+          Meridian Streetwear Collection
+        </div>
+
+        <div class="desc">
+          AI-detected fashion product category with rising conversion
+          trends across social commerce channels.
+        </div>
+
+        <div class="meta">
+
+          <div class="price">
+            $89
+          </div>
+
+          <div class="score">
+
+            <div class="score-label">
+              AI SCORE
+            </div>
+
+            <div class="score-value">
+              91
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="tags">
+
+          <div class="tag">
+            TikTok Demand
+          </div>
+
+          <div class="tag">
+            Growth Market
+          </div>
+
+          <div class="tag">
+            Realtime Trending
+          </div>
+
+        </div>
+
+        <button class="buy">
+          Buy Now
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="cta" id="audit">
+
+  <h2>
+    Start Finding Winning Products Today
+  </h2>
+
+  <p>
+    Book a free strategy call and discover how Meridian helps ecommerce
+    brands identify profitable products before competitors react.
+  </p>
+
+  <div class="hero-actions">
+
+    <a href="#" class="btn primary">
+      Book Free Strategy Call
+    </a>
+
+    <a href="#" class="btn secondary">
+      Start AI Audit
+    </a>
 
   </div>
 
 </section>
 
 <footer>
-  © 2026 Meridian Market by NorthSky — Luxury Autonomous Commerce Infrastructure
+
+  © 2026 Meridian Market by NorthSky
+
 </footer>
 
-<script>
-
-const API = "https://skyscan-ccjt.onrender.com";
-
-/* LOAD PRODUCTS */
-async function loadProducts(){
-
-  const container =
-    document.getElementById("products");
-
-  try{
-
-    const res = await fetch(
-      `${API}/products`
-    );
-
-    if(!res.ok){
-      throw new Error(
-        `API Error ${res.status}`
-      );
-    }
-
-    const products = await res.json();
-
-    if(!Array.isArray(products)){
-      throw new Error(
-        "Invalid products"
-      );
-    }
-
-    if(products.length === 0){
-
-      container.innerHTML = `
-        <div class="empty">
-          No products available
-        </div>
-      `;
-
-      return;
-    }
-
-    container.className = "grid";
-
-    container.innerHTML =
-      products.map(p => {
-
-      const lowStock =
-        Number(p.stock) <= 5;
-
-      const winner =
-        Number(p.score || 0) >= 80;
-
-      return `
-
-        <div class="card">
-
-          <div class="img-wrap">
-
-            <img
-              class="img"
-              src="${escapeHtml(p.image_url)}"
-              loading="lazy"
-
-              onerror="
-                this.src='https://placehold.co/600x600/e5edf4/1f2937?text=Meridian+Market'
-              "
-            />
-
-            <div class="ai-badge ${winner ? 'winner' : ''}">
-              ${
-                winner
-                ? 'AI WINNER'
-                : 'AI VERIFIED'
-              }
-            </div>
-
-          </div>
-
-          <div class="content">
-
-            <div class="title">
-              ${escapeHtml(p.name)}
-            </div>
-
-            <div class="desc">
-              ${escapeHtml(
-                p.description ||
-                "AI selected product optimized for premium conversion."
-              )}
-            </div>
-
-            <div class="meta">
-
-              <div class="price">
-                $${Number(
-                  p.price || 0
-                ).toFixed(2)}
-              </div>
-
-              <div class="score">
-
-                <div class="score-label">
-                  AI SCORE
-                </div>
-
-                <div class="score-value">
-                  ${p.score || "N/A"}
-                </div>
-
-              </div>
-
-            </div>
-
-            <div class="tags">
-
-              <div class="tag ${lowStock ? 'stock-low' : ''}">
-                ${
-                  lowStock
-                  ? 'Low Stock'
-                  : 'In Stock'
-                }
-              </div>
-
-              <div class="tag">
-                ${p.category || "Trending"}
-              </div>
-
-            </div>
-
-            <button
-              class="buy"
-
-              onclick="buy('${p.sku}')"
-
-              ${
-                Number(p.stock) <= 0
-                ? 'disabled'
-                : ''
-              }
-            >
-              ${
-                Number(p.stock) <= 0
-                ? 'Sold Out'
-                : 'Buy Now'
-              }
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-    }).join("");
-
-  } catch(err){
-
-    console.error(err);
-
-    container.innerHTML = `
-      <div class="empty">
-        Failed to load products
-      </div>
-    `;
-  }
-}
-
-/* BUY FLOW */
-async function buy(sku){
-
-  try{
-
-    const res = await fetch(
-      `${API}/create-checkout`,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body: JSON.stringify({
-          sku
-        })
-      }
-    );
-
-    if(!res.ok){
-      throw new Error(
-        "Checkout failed"
-      );
-    }
-
-    const data = await res.json();
-
-    if(data.url){
-
-      window.location.href =
-        data.url;
-
-    } else {
-
-      alert(
-        "Stripe checkout unavailable"
-      );
-    }
-
-  } catch(err){
-
-    console.error(err);
-
-    alert("Network error");
-  }
-}
-
-/* SAFE HTML */
-function escapeHtml(str){
-
-  return String(str || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
-}
-
-loadProducts();
-
-</script>
+<a href="#audit" class="floating">
+  Start Now
+</a>
 
 </body>
 </html>
