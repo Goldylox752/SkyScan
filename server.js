@@ -26,7 +26,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-/* ───────── INTENT + PRODUCT SIGNAL MODEL ───────── */
+/* ───────── INTENTS ───────── */
 const intents = [
   {
     name: "buying",
@@ -68,7 +68,10 @@ function detectIntent(message = "") {
   let bestScore = 0;
 
   for (const intent of intents) {
-    const matches = intent.keywords.filter(k => text.includes(k)).length;
+    const matches = intent.keywords.reduce(
+      (acc, k) => acc + (text.includes(k) ? 1 : 0),
+      0
+    );
 
     if (matches > 0) {
       const score = matches * intent.score;
@@ -100,20 +103,29 @@ function generateReply(intent) {
   };
 }
 
-/* ───────── MERIDIAN LEAD + BUYING SCORE ───────── */
+/* ───────── SCORING ───────── */
 function scoreOpportunity(message, intent) {
   let score = 10;
 
   if (message.length > 50) score += 10;
-  if (intent?.name === "buying") score += 30;
-  if (intent?.name === "product_research") score += 25;
-  if (intent?.name === "dropshipping") score += 20;
   if (message.includes("best")) score += 10;
+
+  switch (intent?.name) {
+    case "buying":
+      score += 30;
+      break;
+    case "product_research":
+      score += 25;
+      break;
+    case "dropshipping":
+      score += 20;
+      break;
+  }
 
   return Math.min(score, 100);
 }
 
-/* ───────── BOT / AI ENGINE ───────── */
+/* ───────── BOT ENGINE ───────── */
 app.post("/api/bot", async (req, res) => {
   try {
     const { message, sessionId } = req.body;
@@ -128,29 +140,42 @@ app.post("/api/bot", async (req, res) => {
     const reply = generateReply(intent);
     const score = scoreOpportunity(message, intent);
 
-    /* ───────── STORE CONVERSATION ───────── */
-    const { data: existing } = await supabase
+    /* ───────── CHECK EXISTING SESSION ───────── */
+    const { data: existing, error: fetchError } = await supabase
       .from("conversations")
       .select("id")
       .eq("session_id", id)
       .limit(1);
 
-    if (!existing || existing.length === 0) {
-      await supabase.from("conversations").insert([
-        {
-          session_id: id,
-          message,
-          reply: reply.text,
-          intent: reply.type,
-          opportunity_score: score,
-          confidence: reply.confidence,
-          created_at: new Date().toISOString()
-        }
-      ]);
+    if (fetchError) {
+      console.error("DB fetch error:", fetchError.message);
     }
 
-    /* ───────── EVENT TRACKING (FOR AI LEARNING LOOP) ───────── */
-    await supabase.from("events").insert([
+    const isNewSession = !existing || existing.length === 0;
+
+    /* ───────── STORE FIRST MESSAGE ONLY ───────── */
+    if (isNewSession) {
+      const { error: insertError } = await supabase
+        .from("conversations")
+        .insert([
+          {
+            session_id: id,
+            message,
+            reply: reply.text,
+            intent: reply.type,
+            opportunity_score: score,
+            confidence: reply.confidence,
+            created_at: new Date().toISOString()
+          }
+        ]);
+
+      if (insertError) {
+        console.error("Conversation insert error:", insertError.message);
+      }
+    }
+
+    /* ───────── EVENT LOG (NON-BLOCKING) ───────── */
+    supabase.from("events").insert([
       {
         type: "user_intent",
         intent: reply.type,
@@ -175,7 +200,7 @@ app.post("/api/bot", async (req, res) => {
   }
 });
 
-/* ───────── HEALTH CHECK ───────── */
+/* ───────── HEALTH ───────── */
 app.get("/", (req, res) => {
   res.json({
     status: "online",
