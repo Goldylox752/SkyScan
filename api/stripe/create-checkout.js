@@ -8,13 +8,19 @@ app.post("/create-checkout", async (req, res) => {
   try {
     const { sku } = req.body;
 
+    /* ─────────────────────────────
+       VALIDATION
+    ───────────────────────────── */
     if (!sku) {
-      return res.status(400).json({ error: "Missing SKU" });
+      return res.status(400).json({ error: "SKU is required" });
     }
 
+    /* ─────────────────────────────
+       FETCH PRODUCT
+    ───────────────────────────── */
     const { data: product, error } = await supabase
       .from("products")
-      .select("*")
+      .select("sku, name, description, price, stock")
       .eq("sku", sku)
       .single();
 
@@ -22,14 +28,19 @@ app.post("/create-checkout", async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    if (!product.price || isNaN(product.price)) {
+    const price = Number(product.price);
+
+    if (!price || price <= 0) {
       return res.status(400).json({ error: "Invalid product price" });
     }
 
-    if (product.stock <= 0) {
+    if (product.stock === 0) {
       return res.status(400).json({ error: "Out of stock" });
     }
 
+    /* ─────────────────────────────
+       STRIPE CHECKOUT SESSION
+    ───────────────────────────── */
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -40,9 +51,9 @@ app.post("/create-checkout", async (req, res) => {
             currency: "usd",
             product_data: {
               name: product.name,
-              description: product.description || "",
+              description: product.description ?? "",
             },
-            unit_amount: Math.round(Number(product.price) * 100),
+            unit_amount: Math.round(price * 100),
           },
           quantity: 1,
         },
@@ -52,21 +63,25 @@ app.post("/create-checkout", async (req, res) => {
         sku: product.sku,
       },
 
-      success_url: `${process.env.FRONTEND_URL}/success`,
+      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel`,
     });
 
-    if (!session.url) {
-      return res.status(500).json({ error: "Stripe session URL missing" });
+    if (!session?.url) {
+      return res.status(500).json({ error: "Failed to create checkout session" });
     }
 
-    return res.json({ url: session.url, id: session.id });
+    return res.json({
+      url: session.url,
+      sessionId: session.id,
+    });
 
   } catch (err) {
-    console.error("Checkout failed:", err);
+    console.error("❌ Checkout error:", err);
+
     return res.status(500).json({
       error: "Checkout failed",
-      details: err.message,
+      message: err.message || "Unknown error",
     });
   }
 });
