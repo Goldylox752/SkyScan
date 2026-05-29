@@ -11,35 +11,35 @@ app.post("/create-checkout", async (req, res) => {
     /* ─────────────────────────────
        VALIDATION
     ───────────────────────────── */
-    if (!sku) {
-      return res.status(400).json({ error: "SKU is required" });
+    if (!sku || typeof sku !== "string") {
+      return res.status(400).json({ error: "Valid SKU is required" });
     }
 
     /* ─────────────────────────────
        FETCH PRODUCT
     ───────────────────────────── */
-    const { data: product, error } = await supabase
+    const { data: product } = await supabase
       .from("products")
       .select("sku, name, description, price, stock")
       .eq("sku", sku)
       .single();
 
-    if (error || !product) {
+    if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
     const price = Number(product.price);
 
-    if (!price || price <= 0) {
+    if (Number.isNaN(price) || price <= 0) {
       return res.status(400).json({ error: "Invalid product price" });
     }
 
-    if (product.stock === 0) {
+    if (product.stock <= 0) {
       return res.status(400).json({ error: "Out of stock" });
     }
 
     /* ─────────────────────────────
-       STRIPE CHECKOUT SESSION
+       CREATE STRIPE SESSION
     ───────────────────────────── */
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -51,7 +51,7 @@ app.post("/create-checkout", async (req, res) => {
             currency: "usd",
             product_data: {
               name: product.name,
-              description: product.description ?? "",
+              description: product.description || "",
             },
             unit_amount: Math.round(price * 100),
           },
@@ -68,9 +68,14 @@ app.post("/create-checkout", async (req, res) => {
     });
 
     if (!session?.url) {
-      return res.status(500).json({ error: "Failed to create checkout session" });
+      return res.status(500).json({
+        error: "Stripe session creation failed",
+      });
     }
 
+    /* ─────────────────────────────
+       RESPONSE
+    ───────────────────────────── */
     return res.json({
       url: session.url,
       sessionId: session.id,
